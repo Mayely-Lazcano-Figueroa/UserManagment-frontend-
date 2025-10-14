@@ -1,4 +1,4 @@
-'use client'
+/*'use client'    //antiguooooo ahora modificadoo a continuacion
 
 import { useState } from 'react'
 import RequesterEditForm from '../controlC/RequesterEditForm'
@@ -73,4 +73,87 @@ export default function Home() {
       )}
     </main>
   )
+}*/
+
+'use client';
+
+import { useState } from 'react';
+import PerfilPage from './editar/editarTelefonoUbicacion';
+
+export default function Home() {
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [usuarioId, setUsuarioId] = useState<string | null>(null); // ID del usuario logueado
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!username || !password) {
+      alert("Ingrese usuario y contraseña");
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ correo: username, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.message); // muestra error si usuario o contraseña son incorrectos
+        return;
+      }
+
+      // Login exitoso
+      setLoggedIn(true);
+      setUsuarioId(data.usuarioId); // guardamos el id del usuario logueado
+
+    } catch (error) {
+      console.error(error);
+      alert("Error en el login");
+    }
+  };
+
+  return (
+    <main className="min-h-screen p-8 max-w-md mx-auto space-y-6">
+      {/* Pantalla de login */}
+      {!loggedIn && (
+        <form onSubmit={handleLogin} className="space-y-3 border p-4 rounded shadow">
+          <h2 className="text-xl font-semibold">Login</h2>
+          <div>
+            <label className="block text-sm font-medium">Usuario</label>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="mt-1 block w-full rounded-md border px-3 py-2"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium">Contraseña</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="mt-1 block w-full rounded-md border px-3 py-2"
+            />
+          </div>
+          <button
+            type="submit"
+            className="rounded bg-blue-600 px-4 py-2 text-white"
+          >
+            Login
+          </button>
+        </form>
+      )}
+
+      {/* Pantalla de perfil */}
+      {loggedIn && usuarioId && <PerfilPage usuarioId={usuarioId} />}
+    </main>
+  );
 }
+
