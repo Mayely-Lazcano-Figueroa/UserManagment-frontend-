@@ -77,12 +77,13 @@ export default function Home() {
 
 'use client';
 
+import RequesterEditForm from '@/controlC/RequesterEditForm'
 import { useState } from 'react';
 import PerfilPage from './editar/editarTelefonoUbicacion';
 
 export default function Home() {
   const [loggedIn, setLoggedIn] = useState(false);
-  const [usuarioId, setUsuarioId] = useState<string | null>(null); // ID del usuario logueado
+  const [usuarioId, setUsuarioId] = useState<string | null>(null);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
@@ -104,23 +105,28 @@ export default function Home() {
       const data = await res.json();
 
       if (!res.ok) {
-        alert(data.message); // muestra error si usuario o contraseña son incorrectos
+        alert(data.message);
         return;
       }
 
-      // Login exitoso
       setLoggedIn(true);
-      setUsuarioId(data.usuarioId); // guardamos el id del usuario logueado
-
+      setUsuarioId(data.usuarioId);
     } catch (error) {
       console.error(error);
       alert("Error en el login");
     }
   };
 
+  // 🔹 Función para cerrar sesión
+  const handleLogout = () => {
+    setLoggedIn(false);
+    setUsuarioId(null);
+    setUsername('');
+    setPassword('');
+  };
+
   return (
     <main className="min-h-screen p-8 max-w-md mx-auto space-y-6">
-      {/* Pantalla de login */}
       {!loggedIn && (
         <form onSubmit={handleLogin} className="space-y-3 border p-4 rounded shadow">
           <h2 className="text-xl font-semibold">Login</h2>
@@ -151,9 +157,10 @@ export default function Home() {
         </form>
       )}
 
-      {/* Pantalla de perfil */}
-      {loggedIn && usuarioId && <PerfilPage usuarioId={usuarioId} />}
+      {/* 🔹 Pasamos handleLogout al componente de perfil */}
+      {loggedIn && usuarioId && (
+        <PerfilPage usuarioId={usuarioId} onLogout={handleLogout} />
+      )}
     </main>
   );
 }
-
