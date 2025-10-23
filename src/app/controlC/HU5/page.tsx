@@ -1,5 +1,5 @@
 'use client'
-import RequesterEditForm from '../../../../controlC/components/RequesterEditForm'
+import RequesterEditForm from './RequesterEditForm'
 
 export default function EditProfilePage() {
   return (
