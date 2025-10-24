@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import { Inter, JetBrains_Mono } from "next/font/google";
-import "../../../app/globals.css";
+
 
 // Fuente principal (Sans)
 const inter = Inter({
