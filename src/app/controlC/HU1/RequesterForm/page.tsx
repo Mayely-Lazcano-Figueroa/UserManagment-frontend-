@@ -2,10 +2,24 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { enviarRegistroManual } from "../service/conecionbackend"; 
+import { useRouter } from "next/navigation";
+import { enviarRegistroManual } from "../service/conecionbackend";
 
+// 💡 Agrega las interfaces necesarias para tipar la respuesta
+interface UserResponse {
+  id: string; // <-- AÑADIMOS EL ID
+  name: string;
+  email: string;
+}
+
+interface RegisterResponse {
+  success: boolean;
+  message?: string;
+  token?: string;
+  user?: UserResponse; // <-- TIPAMOS EL OBJETO USER
+}
 export default function RegistroForm() {
-
+  const router = useRouter();
   const [nombre, setNombre] = useState("");
   const [apellido, setApellido] = useState("");
   const [email, setEmail] = useState("");
@@ -13,6 +27,7 @@ export default function RegistroForm() {
   const [confirmarPassword, setConfirmarPassword] = useState("");
   const [errorRegistro, setErrorRegistro] = useState("");
   const [cargando, setCargando] = useState(false);
+
 
   const contrasenasCoinciden = password === confirmarPassword;
   const longitudValida = password.length >= 8;
@@ -33,10 +48,18 @@ export default function RegistroForm() {
 
     try {
       const data = await enviarRegistroManual(nombreCompleto, email, password);
-
+      console.log("Respuesta del backend:", data);
       if (data.success) {
         alert("Registro exitoso");
+
+        // 💡 CORRECCIÓN CLAVE: Descomenta y usa data.user.id
+        if (data.user?.id) {
+          localStorage.setItem("usuarioId", data.user.id);
+        }
+
         if (data.token) localStorage.setItem("servineo_token", data.token);
+        router.push("../HU1/FotoPerfil");
+
       } else {
         setErrorRegistro(data.message || "Error al registrar el usuario.");
       }
@@ -95,11 +118,10 @@ export default function RegistroForm() {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className={`w-full border rounded-md p-2 text-black focus:outline-none ${
-              email && !emailValido
-                ? "border-red-500"
-                : "border-gray-300 focus:border-[#2BDDE0]"
-            }`}
+            className={`w-full border rounded-md p-2 text-black focus:outline-none ${email && !emailValido
+              ? "border-red-500"
+              : "border-gray-300 focus:border-[#2BDDE0]"
+              }`}
             placeholder="nombre@gmail.com"
           />
           {email && !emailValido && (
@@ -117,11 +139,10 @@ export default function RegistroForm() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className={`w-full border rounded-md p-2 text-black focus:outline-none ${
-                password && (!longitudValida || !contrasenasCoinciden)
-                  ? "border-red-500"
-                  : "border-gray-300 focus:border-[#2BDDE0]"
-              }`}
+              className={`w-full border rounded-md p-2 text-black focus:outline-none ${password && (!longitudValida || !contrasenasCoinciden)
+                ? "border-red-500"
+                : "border-gray-300 focus:border-[#2BDDE0]"
+                }`}
             />
             {password && !longitudValida && (
               <p className="absolute text-sm text-red-500 mt-1 left-0">
@@ -136,11 +157,10 @@ export default function RegistroForm() {
               type="password"
               value={confirmarPassword}
               onChange={(e) => setConfirmarPassword(e.target.value)}
-              className={`w-full border rounded-md p-2 text-black focus:outline-none ${
-                confirmarPassword && !contrasenasCoinciden
-                  ? "border-red-500"
-                  : "border-gray-300 focus:border-[#2BDDE0]"
-              }`}
+              className={`w-full border rounded-md p-2 text-black focus:outline-none ${confirmarPassword && !contrasenasCoinciden
+                ? "border-red-500"
+                : "border-gray-300 focus:border-[#2BDDE0]"
+                }`}
             />
             {confirmarPassword && !contrasenasCoinciden && (
               <p className="absolute text-sm text-red-500 mt-1 left-0">
@@ -153,16 +173,16 @@ export default function RegistroForm() {
         {errorRegistro && (
           <p className="text-sm text-red-500 font-semibold">{errorRegistro}</p>
         )}
-        
+
 
         <button
           type="submit"
           disabled={!formularioValido || cargando}
-          className={`w-full py-2 rounded-md font-semibold text-white transition-colors mt-3 ${
-            formularioValido && !cargando
-              ? "bg-[#5E2BE0] hover:bg-[#4b22b8]"
-              : "bg-gray-400 cursor-not-allowed"
-          }`}
+          className={`w-full py-2 rounded-md font-semibold text-white transition-colors mt-3 ${formularioValido && !cargando
+            ? "bg-[#5E2BE0] hover:bg-[#4b22b8]"
+            : "bg-gray-400 cursor-not-allowed"
+            }`}
+
         >
           {cargando ? "Registrando..." : "Únete"}
         </button>
