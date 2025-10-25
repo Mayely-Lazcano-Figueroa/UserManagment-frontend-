@@ -59,35 +59,35 @@ export default function MapaLeaflet() {
   }, []);
 
   // 🛰️ Enviar ubicación y autenticar usuario si es primera vez
-const manejarEnvio = async () => {
-  if (!position) {
-    toast.error("No se detectó la ubicación.");
-    return;
-  }
+  const manejarEnvio = async () => {
+    if (!position) {
+      toast.error("No se detectó la ubicación.");
+      return;
+    }
 
-  const usuarioId = localStorage.getItem("usuarioId");
-  if (!usuarioId) {
-    toast.error("Usuario no encontrado.");
-    return;
-  }
+    const usuarioId = localStorage.getItem("usuarioId");
+    if (!usuarioId) {
+      toast.error("Usuario no encontrado.");
+      return;
+    }
 
-  const response = await fetch("http://localhost:3001/api/usuarios/ubicacion", {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      usuarioId,
-      latitud: position[0],
-      longitud: position[0]
-    })
-  });
+    const response = await fetch("http://localhost:3001/api/usuarios/ubicacion", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        usuarioId,
+        latitud: position[0],
+        longitud: position[0]
+      })
+    });
 
-  if (response.ok) {
-    toast.success("Ubicación guardada correctamente.");
-    router.push("/ctrlC/app");
-  } else {
-    toast.error("Error al guardar ubicación.");
-  }
-};
+    if (response.ok) {
+      toast.success("Ubicación guardada correctamente.");
+      router.push("/ctrlC/app");
+    } else {
+      toast.error("Error al guardar ubicación.");
+    }
+  };
 
 
   return (
@@ -159,26 +159,26 @@ const manejarEnvio = async () => {
             )}
           </MapContainer>
         </div>
-            <Link href={"/"}>
-        <button
-          style={{
-            backgroundColor: "#2B6AE0",
-            color: "white",
-            padding: "0.8rem 1.8rem",
-            border: "none",
-            borderRadius: "0.6rem",
-            fontWeight: "600",
-            fontSize: "1rem",
-            cursor: "pointer",
-            transition: "0.2s",
-            boxShadow: "0 3px 10px rgba(43,106,224,0.3)",
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#1AA7ED")}
-          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#2B6AE0")}
-          onClick={manejarEnvio}
-        >
-          Finalizar registro
-        </button>
+        <Link href={"/"}>
+          <button
+            style={{
+              backgroundColor: "#2B6AE0",
+              color: "white",
+              padding: "0.8rem 1.8rem",
+              border: "none",
+              borderRadius: "0.6rem",
+              fontWeight: "600",
+              fontSize: "1rem",
+              cursor: "pointer",
+              transition: "0.2s",
+              boxShadow: "0 3px 10px rgba(43,106,224,0.3)",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#1AA7ED")}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#2B6AE0")}
+            onClick={manejarEnvio}
+          >
+            Finalizar registro
+          </button>
         </Link>
       </div>
     </div>
