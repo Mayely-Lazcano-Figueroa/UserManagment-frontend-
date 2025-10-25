@@ -1,17 +1,4 @@
 import React, { ReactNode } from "react";
-import { Inter, JetBrains_Mono } from "next/font/google";
-
-
-// Fuente principal (Sans)
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-});
-
-const jetMono = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
-});
 
 export const metadata = {
   title: "Create Next App",
@@ -25,5 +12,4 @@ export default function Layout({ children }: { children: ReactNode }) {
     </div>
   );
 }
-
 
