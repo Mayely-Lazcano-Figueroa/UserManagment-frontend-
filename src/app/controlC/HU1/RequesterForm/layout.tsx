@@ -1,15 +1,14 @@
-"use client";
-
-import React from "react";
+// app/controlC/HU6/closeSession/layout.tsx
+import React from "react"
 
 export default function Layout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
   return (
-    <div className="flex justify-center items-center min-h-screen bg-[#759AE0]">
+    <section className="min-h-screen flex items-center justify-center bg-gray-100">
       {children}
-    </div>
-  );
+    </section>
+  )
 }
