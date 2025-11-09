@@ -53,7 +53,7 @@ export default function UserMenu() {
   className="block w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100"
   onClick={() => {
     setOpen(false);
-    router.push("controlC/Configuracion"); // Cambia la ruta según tu estructura
+    router.push("controlC/Configuracions"); // Cambia la ruta según tu estructura
   }}
 >
   configuracion
