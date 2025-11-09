@@ -49,6 +49,15 @@ export default function UserMenu() {
 >
   Editar perfil
 </button>
+<button
+  className="block w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100"
+  onClick={() => {
+    setOpen(false);
+    router.push("controlC/Configuracion"); // Cambia la ruta según tu estructura
+  }}
+>
+  configuracion
+</button>
           <button
             className="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-100"
             onClick={logout}
