@@ -193,6 +193,84 @@ export default function RegistroForm() {
 
       {/* Contraseña */}
       {/* (resto de tu código de contraseña y confirmación igual que antes) */}
+      {/* Contraseña */}
+<div className="relative">
+  <label className="block text-sm font-semibold text-gray-600 mb-2">
+    Contraseña*
+  </label>
+  <div className="relative">
+    <input
+      type={mostrarPassword ? "text" : "password"}
+      value={password}
+      onChange={(e) => setPassword(e.target.value)}
+      placeholder="Ingresa tu contraseña"
+      className={`w-full border rounded-xl p-2.5 text-gray-800 focus:outline-none focus:ring-2 transition ${
+        password && !longitudValida
+          ? "border-red-500 focus:ring-red-400"
+          : "border-gray-300 focus:ring-servineo-400"
+      }`}
+      required
+    />
+    <button
+      type="button"
+      onClick={() => setMostrarPassword(!mostrarPassword)}
+      className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
+    >
+      {mostrarPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+    </button>
+  </div>
+
+  {!longitudValida && password && (
+    <p className="text-red-500 text-xs mt-1">Debe tener al menos 8 caracteres.</p>
+  )}
+
+  <button
+    type="button"
+    onClick={handleGenerarContrasena}
+    onMouseEnter={() => setMostrarTooltip(true)}
+    onMouseLeave={() => setMostrarTooltip(false)}
+    className="text-sm text-servineo-500 hover:underline mt-1"
+  >
+    Generar contraseña segura
+  </button>
+
+  {mostrarTooltip && (
+    <div className="absolute top-full left-0 mt-1 bg-gray-100 border border-gray-300 text-gray-700 text-xs px-3 py-2 rounded-lg shadow-md animate-fade-in z-10">
+      Se copiará automáticamente al portapapeles
+    </div>
+  )}
+</div>
+
+{/* Confirmar contraseña */}
+<div className="relative">
+  <label className="block text-sm font-semibold text-gray-600 mb-2">
+    Confirmar contraseña*
+  </label>
+  <div className="relative">
+    <input
+      type={mostrarConfirmarPassword ? "text" : "password"}
+      value={confirmarPassword}
+      onChange={(e) => setConfirmarPassword(e.target.value)}
+      placeholder="Confirma tu contraseña"
+      className={`w-full border rounded-xl p-2.5 text-gray-800 focus:outline-none focus:ring-2 transition ${
+        confirmarPassword && !contrasenasCoinciden
+          ? "border-red-500 focus:ring-red-400"
+          : "border-gray-300 focus:ring-servineo-400"
+      }`}
+      required
+    />
+    <button
+      type="button"
+      onClick={() => setMostrarConfirmarPassword(!mostrarConfirmarPassword)}
+      className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
+    >
+      {mostrarConfirmarPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+    </button>
+  </div>
+  {!contrasenasCoinciden && confirmarPassword && (
+    <p className="text-red-500 text-xs mt-1">Las contraseñas no coinciden.</p>
+  )}
+</div>
 
       {/* Mensaje */}
       {mensaje && (
