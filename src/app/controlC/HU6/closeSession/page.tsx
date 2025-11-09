@@ -1,32 +1,44 @@
 "use client";
 
+import { useRouter } from "next/navigation"; // ✅ importa el hook
 import { useState } from "react";
 import { Button } from "@/app/controlC/HU6/ui/button";
 import { Card, CardContent } from "@/app/controlC/HU6/ui/card";
-import { ArrowLeft, Laptop, Monitor, Smartphone } from "lucide-react";
-
-interface Device {
-  id: string;
-  type: "dispositivo 1" | "dispositivo 2" | "dispositivo 3";
-  location: string;
-  lastActive: string;
-}
+import { ArrowLeft, Laptop, Monitor, Smartphone, PlusCircle } from "lucide-react";
 
 export default function SeguridadPage() {
+  const router = useRouter(); // ✅ define el router antes de usarlo
+  interface Device {
+    id: string;
+    type: "dispositivo 1" | "dispositivo 2" | "dispositivo 3";
+    location: string;
+    lastActive: string;
+  }
   const [devices, setDevices] = useState<Device[]>([
     { id: "1", type: "dispositivo 1", location: "Ubicación 1", lastActive: "xx/xx/2025" },
     { id: "2", type: "dispositivo 2", location: "Ubicación 2", lastActive: "xx/xx/2025" },
     { id: "3", type: "dispositivo 3", location: "Ubicación 3", lastActive: "xx/xx/2025" },
   ]);
 
-  // Elimina un dispositivo individual
-  const handleLogout = (id: string) => {
-    setDevices(devices.filter((d) => d.id !== id));
+  const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
+
+  const handleLogoutConfirm = () => {
+    if (selectedDevice) {
+      setDevices(devices.filter((d) => d.id !== selectedDevice.id));
+      setSelectedDevice(null);
+    }
   };
 
-  // Cierra sesión en todos los dispositivos
-  const handleLogoutAll = () => {
-    setDevices([]);
+  const handleAddDevice = () => {
+    if (devices.length < 3) {
+      const newDevice: Device = {
+        id: (devices.length + 1).toString(),
+        type: `dispositivo ${devices.length + 1}` as Device["type"],
+        location: `Ubicación ${devices.length + 1}`,
+        lastActive: "xx/xx/2025",
+      };
+      setDevices([...devices, newDevice]);
+    }
   };
 
   const getIcon = (type: string) => {
@@ -43,7 +55,7 @@ export default function SeguridadPage() {
   };
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-white">
+    <div className="flex flex-col md:flex-row min-h-screen bg-white relative">
       {/* Sidebar */}
       <aside className="w-full md:w-1/4 border-r p-6 space-y-4">
         <h2 className="text-xl font-semibold">Configuración</h2>
@@ -59,7 +71,10 @@ export default function SeguridadPage() {
 
       {/* Main Content */}
       <main className="flex-1 p-6">
-        <button className="flex items-center text-gray-600 hover:text-gray-800 mb-6">
+        <button
+          onClick={() => router.push("/controlC/Configuracion/Seguridad")}
+          className="flex items-center text-gray-600 hover:text-gray-800 mb-6"
+        >
           <ArrowLeft className="w-5 h-5 mr-2" /> Volver
         </button>
 
@@ -68,6 +83,12 @@ export default function SeguridadPage() {
           Tienes la sesión iniciada en estos dispositivos
         </p>
 
+        {/* ⚠️ Advertencia cuando ya hay 3 dispositivos */}
+        {devices.length >= 3 && (
+          <div className="mb-4 p-3 bg-yellow-100 border border-yellow-300 text-yellow-800 rounded-lg text-sm">
+            ⚠️ No se puede añadir más dispositivos.
+          </div>
+        )}
         <div className="space-y-4">
           {devices.map((device) => (
             <Card key={device.id} className="border border-blue-200">
@@ -85,7 +106,7 @@ export default function SeguridadPage() {
                 <Button
                   variant="destructive"
                   className="bg-red-100 text-red-600 border border-red-300 hover:bg-red-200"
-                  onClick={() => handleLogout(device.id)}
+                  onClick={() => setSelectedDevice(device)}
                 >
                   Cerrar sesión
                 </Button>
@@ -94,33 +115,38 @@ export default function SeguridadPage() {
           ))}
         </div>
 
-        {/* Botón para cerrar todas las sesiones */}
-        {devices.length > 0 && (
-          <div className="mt-6 flex justify-center">
-            <Button
-              variant="destructive"
-              className="bg-red-500 text-white hover:bg-red-600 px-6 py-2 rounded-md"
-              onClick={handleLogoutAll}
-            >
-              Cerrar sesión en todos los dispositivos
-            </Button>
-          </div>
-        )}
-
-        {/* Mensaje si hay 3 dispositivos */}
-        {devices.length >= 3 && (
-          <div className="mt-4 text-center">
-            <p className="text-red-600 font-medium">
-              ⚠️ No se puede añadir más dispositivos (máximo 3 permitidos)
-            </p>
-          </div>
-        )}
-
         <footer className="text-sm text-gray-400 mt-10 flex justify-between">
           <p>Términos</p>
           <p>Ayuda</p>
         </footer>
       </main>
+
+      {/* Modal de confirmación */}
+      {selectedDevice && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-xl shadow-lg p-6 w-80 text-center">
+            <h2 className="text-lg font-semibold mb-2">¿Cerrar sesión?</h2>
+            <p className="text-gray-600 mb-4">
+              Se cerrará la sesión del {selectedDevice.type}.
+            </p>
+            <div className="flex justify-around">
+              <Button
+                onClick={() => setSelectedDevice(null)}
+                className="bg-gray-200 text-gray-700 hover:bg-gray-300"
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={handleLogoutConfirm}
+                className="bg-red-500 text-white hover:bg-red-600"
+              >
+                Aceptar
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
-}
+}  
+
