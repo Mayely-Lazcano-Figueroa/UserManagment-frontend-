@@ -65,7 +65,7 @@ export default function SeguridadPage() {
                 {safeUser.name ?? safeUser.email}
               </span>
 
-              <UserMenu open={menuOpen} onToggle={() => setMenuOpen((s) => !s)} />
+              <UserMenu />
             </div>
           ) : (
             <Link
