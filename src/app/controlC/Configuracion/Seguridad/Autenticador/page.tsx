@@ -2,13 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Edit, Shield, Key, LogIn, ArrowLeft } from 'lucide-react';
-import { useAuth } from '../../HU3/hooks/usoAutentificacion';
-import UserMenu from '../../HU3/components/UI/menuUsuario';
-
+import { Edit, Shield, ArrowLeft } from 'lucide-react';
+import { useAuth } from '../../../HU3/hooks/usoAutentificacion';
+import UserMenu from '../../../HU3/components/UI/menuUsuario';
 import { useState } from 'react';
 
-export default function SeguridadPage() {
+export default function AutenticadorIntroPage() {
   const { user } = useAuth();
   const router = useRouter();
 
@@ -28,7 +27,7 @@ export default function SeguridadPage() {
 
   return (
     <div className="font-sans flex flex-col min-h-screen bg-gray-50 text-gray-800">
-      {/* Header (mismo estilo que Configuración) */}
+      {/* Header (igual a las demás secciones) */}
       <header
         className="flex justify-between items-center px-10 py-6 shadow-sm border-b border-white/20 text-white"
         style={{
@@ -48,7 +47,6 @@ export default function SeguridadPage() {
                 title={safeUser.name ?? safeUser.email}
               >
                 {safeUser.url_photo ? (
-                  // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={safeUser.url_photo}
                     alt={safeUser.name ?? safeUser.email ?? 'Usuario'}
@@ -81,8 +79,7 @@ export default function SeguridadPage() {
       {/* Layout */}
       <div className="flex flex-1">
         {/* Sidebar (igual que Configuración) */}
-      {/* Sidebar */}
-<aside className="w-64 bg-white p-6 flex flex-col justify-between relative shadow-md">
+       <aside className="w-64 bg-white p-6 flex flex-col justify-between relative shadow-md">
   {/* Línea vertical sutil (gradiente) */}
   <div className="absolute right-0 top-4 bottom-4 w-[1.5px] bg-gradient-to-b from-transparent via-gray-300/90 to-transparent pointer-events-none" />
   
@@ -149,63 +146,53 @@ export default function SeguridadPage() {
   </div>
 </aside>
 
-        {/* Main content: centered title + row of action cards */}
-        <main className="flex-1 flex flex-col items-center p-8">
-          <div className="max-w-4xl w-full">
-            <h2 className="text-xl font-semibold text-center mb-2">Seguridad</h2>
-            <p className="text-sm text-center text-gray-600 mb-8">
-              Opciones y recomendaciones que te ayudan a proteger tu cuenta
-            </p>
+        {/* Main content: intro to authenticator */}
+        <main className="flex-1 flex items-start justify-center p-8">
+          <div className="w-full max-w-3xl">
+            {/* Back link at top-left of content area (optional) */}
+            <div className="mb-6 flex items-center gap-4">
+              <button
+                onClick={() => router.back()}
+                className="flex items-center gap-2 text-gray-700 hover:text-gray-900 transition cursor-pointer"
+                aria-label="Volver"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <h2 className="text-xl font-semibold">Aplicación authenticator</h2>
+            </div>
 
-            {/* Centered controls */}
-            {/* Centered controls: 1 column on mobile, 2 columns on sm+ */}
-<div className="grid grid-cols-1 sm:grid-cols-2 gap-6 justify-center max-w-4xl mx-auto">
-  {/* Card 1: Cambiar contraseña */}
-  <button
-    onClick={() => router.push('/controlC/HU8')}
-    className="flex items-center gap-3 px-6 py-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ease-out bg-white text-gray-800 cursor-pointer w-full"
-  >
-    <div className="p-2 rounded-md bg-blue-50">
-      <img
-        src="/icons/edit-pass.png"
-        alt="Cambiar contraseña"
-        className="w-8 h-8 object-contain"
-      />
-    </div>
-    <span className="font-medium">Cambiar contraseña</span>
-  </button>
+            <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-200">
+              <p className="text-gray-700 mb-6">
+                En vez de esperar a que lleguen mensajes de texto, puedes obtener códigos de verificación desde una
+                aplicación de autenticación.
+              </p>
 
-  {/* Card 2: dispositivos vinculados */}
-  <button
-    onClick={() => router.push('/controlC/Configuracion/Seguridad/Inicios')}
-    className="flex items-center gap-3 px-6 py-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ease-out bg-white text-gray-800 cursor-pointer w-full"
-  >
-    <div className="p-2 rounded-md bg-blue-50">
-      <img
-        src="/icons/logins.png"
-        alt="Dispositivos vinculados"
-        className="w-8 h-8 object-contain"
-      />
-    </div>
-    <span className="font-medium">Dispositivos vinculados</span>
-  </button>
+              <p className="text-center text-sm text-gray-600 mb-6">
+                Primero, descarga Google Authenticator desde{' '}
+                <a className="text-blue-600 hover:underline" href="https://play.google.com/store" target="_blank" rel="noreferrer">
+                  Google Play Store
+                </a>{' '}
+                o desde{' '}
+                <a className="text-blue-600 hover:underline" href="https://www.apple.com/app-store/" target="_blank" rel="noreferrer">
+                  App Store
+                </a>{' '}
+                de iOS.
+              </p>
 
-  {/* Card 3: Autenticador (aparecerá debajo del Card 1) */}
-  <button
-    onClick={() => router.push('/controlC/Configuracion/Seguridad/Autenticador')}
-    className="flex items-center gap-3 px-6 py-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ease-out bg-white text-gray-800 cursor-pointer w-full"
-  >
-    <div className="p-2 rounded-md bg-blue-50">
-      <img
-        src="/icons/autenticador.png"
-        alt="Autenticador"
-        className="w-8 h-8 object-contain"
-      />
-    </div>
-    <span className="font-medium">Autenticador</span>
-  </button>
-</div>
-
+              <div className="flex justify-center">
+                <button
+                  onClick={() => router.push('/controlC/Configuracion/Seguridad/Autenticador/Configurar')}
+                  className="inline-flex items-center gap-3 px-5 py-2 border border-red-200 rounded-lg bg-white hover:shadow-md transition-all duration-250 ease-out"
+                >
+                  {/* gear icon look */}
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 8v4l2 2" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06A2 2 0 014.28 18.9l.06-.06A1.65 1.65 0 004.67 17c-.02-.33-.08-.66-.18-.97A2 2 0 013.8 12c0-.34.03-.67.09-.99.1-.31.16-.64.18-.97a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 008.5 4.67c.33.02.66.08.97.18.31.1.64.16.97.18.34.02.67.03 1.01.03s.67-.01 1.01-.03c.33-.02.66-.08.97-.18.31-.1.64-.16.97-.18a1.65 1.65 0 001.82.33l.06-.06a2 2 0 012.83 2.83l-.06.06c.36.35.55.83.5 1.32z" />
+                  </svg>
+                  <span className="text-sm text-gray-700">Configurar autenticador</span>
+                </button>
+              </div>
+            </div>
           </div>
         </main>
       </div>
