@@ -4,71 +4,74 @@
 //Controlar si se puede agregar un nuevo dispositivo (límite 3).
 
 "use client";
-
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
 
-export interface Device {
+interface Device {
   deviceId: string;
-  type: "desktop" | "tablet" | "mobile";
+  type: string;
   browser?: string;
-  lastActive: string;
   location?: string;
+  lastActive: string;
 }
 
-export const useDevices = () => {
-  const { data: session } = useSession();
+export function useDevices() {
   const [devices, setDevices] = useState<Device[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentDeviceId, setCurrentDeviceId] = useState<string>("");
+  const [canAddDevice, setCanAddDevice] = useState(true);
 
-  const currentDeviceId = typeof window !== "undefined" ? localStorage.getItem("deviceId") : null;
+  // genera o obtiene deviceId del localStorage
+  const getOrCreateDeviceId = () => {
+    let id = localStorage.getItem("deviceId");
+    if (!id) {
+      id = crypto.randomUUID();
+      localStorage.setItem("deviceId", id);
+    }
+    return id;
+  };
 
+  // obtener dispositivos del usuario
   const fetchDevices = async () => {
-    // Ensure we have a session user; prefer an explicit id if present, otherwise fall back to email.
-    if (!session?.user) return;
-
-    const userId = (session.user as any).id ?? session.user.email;
-    if (!userId) return;
-
     setLoading(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/devices?userId=${encodeURIComponent(String(userId))}`);
+      const userId = localStorage.getItem("userId"); // <-- asegúrate de guardar esto al hacer login
+      const res = await fetch(`http://localhost:8000/api/controlC/devices/${userId}`);
       if (!res.ok) throw new Error("Error al obtener dispositivos");
-      const data: Device[] = await res.json();
+      const data = await res.json();
       setDevices(data);
+      setCanAddDevice(data.length < 3);
     } catch (err: any) {
-      setError(err.message || "Error desconocido");
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
+  // cerrar sesión en un dispositivo específico
   const logoutDevice = async (deviceId: string) => {
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/devices/${deviceId}`, {
-        method: "DELETE",
-      });
-      if (!res.ok) throw new Error("Error al cerrar sesión");
-      setDevices(devices.filter(d => d.deviceId !== deviceId));
-    } catch (err: any) {
-      throw new Error(err.message || "Error desconocido");
-    }
+    const userId = localStorage.getItem("userId");
+    const res = await fetch(`http://localhost:8000/api/controlC/devices/logout`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId, deviceId }),
+    });
+    if (!res.ok) throw new Error("No se pudo cerrar la sesión");
+    await fetchDevices(); // actualizar lista
   };
 
-  const canAddDevice = devices.length < 3;
-
   useEffect(() => {
+    const id = getOrCreateDeviceId();
+    setCurrentDeviceId(id);
     fetchDevices();
-  }, [session]);
+  }, []);
 
   return {
     devices,
     loading,
     error,
     currentDeviceId,
-    fetchDevices,
     logoutDevice,
     canAddDevice,
   };
-};
+}
