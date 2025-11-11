@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import { Mail, Github, LucideIcon } from "lucide-react";
+import { FaGithub } from "react-icons/fa";
+import { FcGoogle } from "react-icons/fc";
 import {
   obtenerMetodosCliente,
   desvincularMetodo,
@@ -10,6 +12,7 @@ import {
 import VincularCorreo from "../vinculos/vincularCorreo";
 import VincularGoogle from "../vinculos/vincularGoogle";
 import VincularGithub from "../vinculos/vincularGithub";
+
 
 interface Props {
   token?: string;
@@ -31,9 +34,8 @@ interface FullAuthProvider extends AuthProvider {
   name: string;
 }
 
-export default function Page({ token = "" }: Props) {
+export default function AccountLoginSettings({ token = "" }: Props) {
   const [methods, setMethods] = useState<FullAuthProvider[]>([]);
-  const [showEmailForm, setShowEmailForm] = useState(false);
 
   const buildFullMethodsList = (
     linkedMethodsFromAPI: AuthProvider[]
@@ -107,147 +109,120 @@ export default function Page({ token = "" }: Props) {
   };
 
   return (
-    <main className="min-h-screen bg-white flex flex-col items-center py-10 px-4">
-      <div className="w-full max-w-3xl bg-white border border-gray-200 rounded-2xl shadow-md p-8">
-        <h1 className="text-2xl font-semibold text-gray-900 mb-6 text-center">
-          Configuración de Cuentas Vinculadas
-        </h1>
+    <div className="w-full max-w-3xl bg-white border border-gray-200 rounded-2xl shadow-md p-8 mx-auto">
+      <h1 className="text-2xl font-semibold text-gray-900 mb-6 text-center">
+        Configuración de Cuentas Vinculadas
+      </h1>
 
-        {/* Métodos vinculados */}
-        <section className="mb-10">
-          <h2 className="text-lg font-semibold text-gray-800 mb-3">
-            Cuentas Vinculadas ({linkedMethods.length})
-          </h2>
-          <div className="space-y-3">
-            {linkedMethods.map((method) => {
-              const Icon = iconMap[method.provider] as LucideIcon;
-              return (
-                <div
-                  key={method.provider}
-                  className="flex justify-between items-center bg-white border border-gray-200 rounded-xl px-4 py-3 shadow-sm hover:shadow-md transition-all duration-200"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg text-blue-700">
-                      {method.provider === "google" ? (
-                        <img
-                          src="https://www.svgrepo.com/show/475656/google-color.svg"
-                          alt="Google"
-                          className="w-5 h-5"
-                        />
-                      ) : (
-                        <Icon className="w-5 h-5" />
-                      )}
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-800 flex items-center gap-2">
-                        {method.name}
-                        <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
-                          Activo
-                        </span>
-                      </p>
-                      {method.email && (
-                        <p className="text-gray-500 text-sm">{method.email}</p>
-                      )}
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => handleUnlink(method.provider)}
-                    disabled={linkedMethods.length <= 1}
-                    className={`text-sm font-medium px-4 py-1.5 rounded-lg transition-all duration-200 ${
-                      linkedMethods.length <= 1
-                        ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                        : "bg-red-50 text-red-600 hover:bg-red-100"
-                    }`}
-                  >
-                    Desvincular
-                  </button>
-                </div>
-              );
-            })}
-          </div>
-        </section>
+      {/* Métodos vinculados */}
+      <section className="mb-10">
+  <h2 className="text-lg font-semibold text-gray-800 mb-3">
+    Cuentas Vinculadas ({linkedMethods.length})
+  </h2>
 
-        {/* Métodos disponibles */}
-        <section>
-          <h2 className="text-lg font-semibold text-gray-800 mb-3">
-            Métodos Disponibles ({availableMethods.length})
-          </h2>
+  <div className="space-y-3">
+    {linkedMethods.map((method) => {
+      return (
+        <div
+          key={method.provider}
+          className="w-full flex items-center justify-between bg-white border border-gray-200 rounded-2xl px-4 py-3 shadow-sm hover:bg-gray-50 transition"
+        >
+          <div className="flex items-center gap-3">
+            {/* Íconos con mismo estilo que los componentes de vinculación */}
+            {method.provider === "google" && (
+              <FcGoogle size={30} />
+            )}
+            {method.provider === "github" && (
+              <FaGithub size={30} className="text-gray-800" />
+            )}
+            {method.provider === "email" && (
+              <Mail size={28} className="text-gray-800" />
+            )}
 
-          {availableMethods.length === 0 ? (
-            <p className="text-gray-400 text-center py-4">
-              Todos los métodos están actualmente vinculados.
-            </p>
-          ) : (
-            <div className="space-y-3">
-              {availableMethods.map((method) => {
-                if (method.provider === "google") {
-                  return (
-                    <VincularGoogle
-                      key="google"
-                      tokenUsuario={token}
-                      onLinked={() => handleLink("google")}
-                    />
-                  );
-                }
-                if (method.provider === "github") {
-                  return (
-                    <VincularGithub
-                      key="github"
-                      onLinked={() => handleLink("github")}
-                    />
-                  );
-                }
-
-                const Icon = iconMap[method.provider] as LucideIcon;
-                return (
-                  <div
-                    key={method.provider}
-                    className="flex justify-between items-center bg-white border border-gray-200 rounded-xl px-4 py-3 shadow-sm hover:shadow-md transition-all duration-200"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg text-gray-600">
-                        <Icon className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <p className="font-medium text-gray-800">
-                          {method.name}
-                        </p>
-                        <p className="text-gray-500 text-sm">
-                          Vincula tu cuenta para un acceso rápido.
-                        </p>
-                      </div>
-                    </div>
-
-                    {method.provider === "email" && (
-                      <button
-                        onClick={() => setShowEmailForm(!showEmailForm)}
-                        className="text-sm font-medium px-4 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-all duration-200"
-                      >
-                        {showEmailForm ? "Cancelar" : "Vincular"}
-                      </button>
-                    )}
-                  </div>
-                );
-              })}
-
-              {showEmailForm && (
-                <div className="mt-3">
-                  <VincularCorreo
-                    token={token}
-                    onLinked={(client) => {
-                      const fullList = buildFullMethodsList(
-                        client.authProviders
-                      );
-                      setMethods(fullList);
-                      setShowEmailForm(false);
-                    }}
-                  />
-                </div>
+            <div className="flex flex-col">
+              <span className="text-sm font-semibold text-gray-800 flex items-center gap-2">
+                {method.name}
+                <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+                  Activo
+                </span>
+              </span>
+              {method.email && (
+                <span className="text-xs text-gray-500 mt-0.5">{method.email}</span>
               )}
             </div>
-          )}
-        </section>
-      </div>
-    </main>
+          </div>
+
+          {/* Botón de Desvincular con estilo coherente */}
+          <button
+            onClick={() => handleUnlink(method.provider)}
+            disabled={linkedMethods.length <= 1}
+            className={`flex items-center justify-center gap-2 text-sm font-medium px-4 py-2 rounded-xl transition disabled:opacity-60 ${
+              linkedMethods.length <= 1
+                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                : "bg-red-50 text-red-600 hover:bg-red-100"
+            }`}
+          >
+            Desvincular
+          </button>
+        </div>
+      );
+    })}
+  </div>
+</section>
+
+
+
+      {/* Métodos disponibles */}
+      <section>
+        <h2 className="text-lg font-semibold text-gray-800 mb-3">
+          Métodos Disponibles ({availableMethods.length})
+        </h2>
+
+        {availableMethods.length === 0 ? (
+          <p className="text-gray-400 text-center py-4">
+            Todos los métodos están actualmente vinculados.
+          </p>
+        ) : (
+          <div className="space-y-3">
+            {availableMethods.map((method) => {
+              if (method.provider === "google") {
+                return (
+                  <VincularGoogle
+                    key="google"
+                    tokenUsuario={token}
+                    onLinked={() => handleLink("google")}
+                  />
+                );
+              }
+
+              if (method.provider === "github") {
+                return (
+                  <VincularGithub
+                    key="github"
+                    onLinked={() => handleLink("github")}
+                  />
+                );
+              }
+
+              if (method.provider === "email") {
+                // Aquí reemplazamos el botón por el formulario directo
+                return (
+                  <VincularCorreo
+                    key="email"
+                    token={token}
+                    onLinked={(client) => {
+                      const fullList = buildFullMethodsList(client.authProviders);
+                      setMethods(fullList);
+                    }}
+                  />
+                );
+              }
+
+              return null;
+            })}
+          </div>
+        )}
+      </section>
+    </div>
   );
 }
