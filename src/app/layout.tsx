@@ -12,9 +12,13 @@ export default function ControlCLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="es">
       <head />
-      <body>
+
+        <body className="min-h-screen bg-[radial-gradient(circle_at_center,_#cce5ff,_#99ccff,_#66b3ff)]">
+
         <AuthProvider>
-          {children}
+          <div className="min-h-screen flex flex-col">
+            {children}
+          </div>
           {/* Contenedor global para todos los toasts */}
           <ToastContainer
             position="bottom-right"
