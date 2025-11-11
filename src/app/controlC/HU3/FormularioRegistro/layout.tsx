@@ -11,9 +11,8 @@ export default function LoginLayout({ children }: { children: ReactNode }) {
 
   return (
     <GoogleOAuthProvider clientId={clientId}>
-      <div 
+      <div
         className="min-h-screen w-full flex items-center justify-center 
-                   bg-white 
                    bg-gradient-to-br from-servineo-500 via-servineo-300 to-servineo-400 
                    p-6"
       >
@@ -22,6 +21,3 @@ export default function LoginLayout({ children }: { children: ReactNode }) {
     </GoogleOAuthProvider>
   );
 }
-
-
-

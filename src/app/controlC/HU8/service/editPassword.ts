@@ -42,7 +42,9 @@ export async function cambiarContrasena(
 
     const result: ChangePasswordResponse = await response.json();
     return result;
-  } catch (error: any) {
+  } 
+   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  catch (error: any) {
     console.error("Error al cambiar contraseña:", error);
     throw error;
   }

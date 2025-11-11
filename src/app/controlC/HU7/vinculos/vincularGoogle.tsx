@@ -8,6 +8,7 @@ import { Loader2 } from "lucide-react";
 import { vincularGoogle } from "../service/api";
 
 interface VincularGoogleProps {
+   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onLinked?: (client: any) => void;
   tokenUsuario?: string;
 }

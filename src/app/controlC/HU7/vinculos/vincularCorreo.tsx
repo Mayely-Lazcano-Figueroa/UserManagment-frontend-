@@ -7,6 +7,7 @@ export default function VincularCorreo({
   onLinked,
 }: {
   token: string;
+   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onLinked?: (client: any) => void;
 }) {
   const [email, setEmail] = useState("");

@@ -66,6 +66,7 @@ export async function desvincularMetodo(provider: string): Promise<AuthProvider[
 export interface VincularResultado {
   success: boolean;
   message: string;
+   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   client?: any;
 }
 
@@ -88,7 +89,9 @@ export async function vincularCorreoContrasena(
     if (!res.ok) throw new Error(data.message || "Error al vincular método");
 
     return { success: true, message: "Método vinculado correctamente", client: data.client };
-  } catch (err: any) {
+  } 
+   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  catch (err: any) {
     return { success: false, message: err.message };
   }
 }
@@ -98,10 +101,11 @@ export async function vincularCorreoContrasena(
 
 export interface GitHubLinkResult {
   success: boolean;
+   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   client?: any;
   message?: string;
 }
-
+ // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function vincularGitHub(token: string, onSuccess?: (client: any) => void, onError?: (msg: string) => void) {
   const state = encodeURIComponent(JSON.stringify({ mode: "link", token }));
 
@@ -135,11 +139,9 @@ export function vincularGitHub(token: string, onSuccess?: (client: any) => void,
   window.addEventListener("message", handleMessage);
 }
 
-
-// app/HU7/services/vincularGoogleService.ts
-
 export interface GoogleLinkResult {
   success: boolean;
+   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   client?: any;
   message?: string;
 }
@@ -162,7 +164,9 @@ export async function vincularGoogle(tokenUsuario: string, tokenGoogle: string):
     }
 
     return { success: true, message: "Cuenta de Google vinculada correctamente", client: data.client };
-  } catch (err: any) {
+  } 
+   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    catch (err: any) {
     return { success: false, message: err.message || "Error al vincular Google" };
   }
 }

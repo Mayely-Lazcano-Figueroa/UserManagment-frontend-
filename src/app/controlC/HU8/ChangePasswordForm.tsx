@@ -100,7 +100,9 @@ export default function ChangePasswordForm({ onCancel, onSaved }: Props) {
       } else {
         setError(result.message || 'Error al cambiar la contraseña');
       }
-    } catch (err: any) {
+    } 
+     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    catch (err: any) {
       setError(err.message || 'Error al cambiar la contraseña');
     } finally {
       setLoading(false);

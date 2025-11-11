@@ -3,16 +3,19 @@ import React, { useState } from "react";
 import { Github } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useAuth } from "../../../HU3/hooks/usoAutentificacion";
 
 export default function GithubButton() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+  const { setUser } = useAuth();
 
   const handleGithub = () => {
     setLoading(true);
 
     const popup = window.open(
-      "http://localhost:8000/auth/github",
+      `${BASE_URL}/auth/github`,
       "GitHubLogin",
       "width=600,height=700"
     );
@@ -23,14 +26,25 @@ export default function GithubButton() {
     }
 
     const handleMessage = (event: MessageEvent) => {
-      if (event.origin !== "http://localhost:8000") return;
-
+      if (event.origin !== BASE_URL) return;
       const data = event.data;
 
       if (data.type === "GITHUB_AUTH_SUCCESS") {
         toast.success("Autenticación con GitHub exitosa");
+        // Guardar token
         localStorage.setItem("servineo_token", data.token);
 
+        // Guardar usuario y actualizar contexto
+        if (data.user) {
+          localStorage.setItem("servineo_user", JSON.stringify(data.user));
+          setUser(data.user);
+          sessionStorage.setItem(
+            "toastMessage",
+            `¡Bienvenido, ${data.user.name}!`
+          );
+        }
+
+        // Redirigir según si es la primera vez
         if (data.isFirstTime) {
           router.push("/controlC/HU3/ubicacion");
         } else {

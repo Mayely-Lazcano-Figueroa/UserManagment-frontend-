@@ -7,51 +7,67 @@ import DiscordButton from "../../HU7/components/UI/buttonDiscord";
 
 export default function SignUp() {
   return (
-    <div className="w-full max-w-sm bg-white rounded-3xl shadow-2xl p-10 border border-servineo-100 hover:shadow-servineo-300 transition-shadow duration-300">
-      <h1 className="text-3xl font-bold text-center text-black mb-2">
-        Regístrate <span className="text-servineo-500">Servineo</span>
-      </h1>
-      <p className="text-center text-sm text-gray-700 mb-8">
-        Crea tu cuenta como requester
-      </p>
+    <section className="flex justify-center items-center min-h-screen bg-gradient-to-b from-white to-blue-50 animate-fadeInUp">
+      <div className="w-full max-w-md bg-white/90 backdrop-blur-xl border border-blue-100 rounded-3xl shadow-xl p-10 transition-all duration-300 hover:shadow-2xl hover:scale-[1.01]">
+        {/* Título */}
+        <h1 className="text-4xl font-bold text-center text-gray-800 mb-2">
+          Regístrate en{" "}
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-400">
+            Servineo
+          </span>
+        </h1>
 
-      <RegistroForm />
+        {/* Subtítulo */}
+        <p className="text-center text-gray-600 mb-8 text-sm">
+          Crea tu cuenta como requester y empieza a publicar tus servicios
+        </p>
 
-      <div className="flex items-center my-5">
-        <div className="flex-1 h-px bg-gray-300"></div>
-        <span className="px-2 text-gray-400 text-sm">o</span>
-        <div className="flex-1 h-px bg-gray-300"></div>
-      </div>
+        {/* Formulario principal */}
+        <RegistroForm />
 
-      <div className="flex flex-col items-center space-y-3 mt-3">
-        <RegistroGoogle />
-        <GithubButton />
-        <DiscordButton />
-      </div>
+        {/* Separador */}
+        <div className="flex items-center my-6">
+          <div className="flex-1 h-px bg-gray-300" />
+          <span className="px-3 text-gray-400 text-sm">o continúa con</span>
+          <div className="flex-1 h-px bg-gray-300" />
+        </div>
 
-      <div className="flex items-center mt-5 text-sm text-gray-600">
-        <input type="checkbox" className="mr-2" />
-        <p>
-          Al registrarte aceptas los{" "}
+        {/* Botones de redes sociales */}
+        <div className="flex flex-col items-center space-y-3 mt-3">
+          <RegistroGoogle />
+          <GithubButton />
+          <DiscordButton />
+        </div>
+
+        {/* Términos y condiciones */}
+        <div className="flex items-start mt-5 text-sm text-gray-600">
+          <input
+            type="checkbox"
+            className="mt-1 mr-2 accent-blue-500 focus:ring-2 focus:ring-blue-300 rounded"
+          />
+          <p>
+            Al registrarte aceptas los{" "}
+            <Link
+              href="../HU1/RequesterForm/Terminosycondiciones"
+              className="underline text-blue-500 hover:text-blue-400 transition"
+            >
+              términos de uso
+            </Link>
+            .
+          </p>
+        </div>
+
+        {/* Enlace de inicio de sesión */}
+        <p className="mt-6 text-center text-gray-700 text-sm">
+          ¿Ya tienes cuenta?{" "}
           <Link
-            href="../HU1/RequesterForm/Terminosycondiciones"
-            className="underline cursor-pointer text-[#2BDDE0]"
+            href="../HU4/login"
+            className="text-blue-500 hover:text-blue-400 font-semibold hover:underline transition"
           >
-            términos de uso
-          </Link>{" "}
+            Inicia sesión
+          </Link>
         </p>
       </div>
-
-      <p className="mt-1 text-center text-sm text-gray-700">
-        ¿Ya tienes cuenta?{" "}
-        <a
-          href="../HU4/login"
-          className="text-servineo-400 hover:text-servineo-500 font-medium hover:underline transition"
-        >
-          Inicia sesión
-        </a>
-      </p>
-    </div>
+    </section>
   );
 }
-

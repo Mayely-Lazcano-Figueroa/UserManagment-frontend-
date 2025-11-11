@@ -5,9 +5,8 @@ import { useAuth } from "../../hooks/usoAutentificacion";
 import { useRouter } from "next/navigation";
 
 type Props = {
-  open?: boolean;                // si el padre quiere controlarlo
-  onToggle?: () => void;         // función para alternar (desde el padre)
-  // si no se pasan props el componente se comporta como antes (control interno)
+  open?: boolean;
+  onToggle?: () => void;
 };
 
 export default function UserMenu({ open: openProp, onToggle }: Props) {
@@ -23,8 +22,6 @@ export default function UserMenu({ open: openProp, onToggle }: Props) {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         if (isControlled) {
-          // si es controlado por el padre, asumimos que el padre manejará el cierre
-          // nada que hacer aquii
         } else {
           setOpenInternal(false);
         }
@@ -36,7 +33,6 @@ export default function UserMenu({ open: openProp, onToggle }: Props) {
 
   if (!user) return null;
 
-  // Función para alternar el menú (usa onToggle si está dado, sino su propio state)
   function toggle() {
     if (isControlled) {
       onToggle && onToggle();
@@ -47,7 +43,6 @@ export default function UserMenu({ open: openProp, onToggle }: Props) {
 
   return (
     <div className="relative" ref={menuRef}>
-      {/* El trigger (avatar) está en el padre; aqui solo mostramos el menu */}
       {open && (
         <div className="absolute right-0 mt-7 w-56 
             bg-white border border-gray-200 rounded-xl shadow-xl z-50 
@@ -58,7 +53,6 @@ export default function UserMenu({ open: openProp, onToggle }: Props) {
               <button
                 className="w-full text-center px-4 py-3 hover:bg-gray-100 text-gray-700 transition cursor-pointer hover:scale-[1.03] hover:font-semibold   transition-all duration-300 ease-out"
                 onClick={() => {
-                  // cerramos y navegamos a Perfil
                   if (isControlled) {
                     onToggle && onToggle();
                     router.push("/controlC/HU5");
@@ -76,7 +70,6 @@ export default function UserMenu({ open: openProp, onToggle }: Props) {
               <button
                 className="w-full text-center px-4 py-3 hover:bg-gray-100 text-gray-700 cursor-pointer hover:scale-[1.03] hover:font-semibold   transition-all duration-300 ease-out"
                 onClick={() => {
-                  // cerramos y navegamos a Configuracioon HU8
                    if (isControlled) {
                     onToggle && onToggle();
                     router.push("/controlC/Configuracion");

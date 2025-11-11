@@ -1,8 +1,3 @@
-// src/app/controlC/HU6/hooks/useDevices.tsx
-//Obtener los dispositivos del usuario.
-//Manejar el cierre de sesión en un dispositivo.
-//Controlar si se puede agregar un nuevo dispositivo (límite 3).
-
 "use client";
 import { useState, useEffect } from "react";
 
@@ -20,6 +15,7 @@ export function useDevices() {
     const [error, setError] = useState<string | null>(null);
     const [currentDeviceId, setCurrentDeviceId] = useState<string>("");
     const [canAddDevice, setCanAddDevice] = useState(true);
+    const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
     // genera o obtiene deviceId del localStorage
     const getOrCreateDeviceId = () => {
@@ -36,12 +32,14 @@ export function useDevices() {
         setLoading(true);
         try {
             const userId = localStorage.getItem("userId"); // <-- asegúrate de guardar esto al hacer login
-            const res = await fetch(`http://localhost:8000/api/controlC/devices/${userId}`);
+            const res = await fetch(`${BASE_URL}/api/controlC/devices/${userId}`);
             if (!res.ok) throw new Error("Error al obtener dispositivos");
             const data = await res.json();
             setDevices(data);
             setCanAddDevice(data.length < 3);
-        } catch (err: any) {
+        }
+             // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        catch (err: any) {
             setError(err.message);
         } finally {
             setLoading(false);
@@ -51,7 +49,7 @@ export function useDevices() {
     // cerrar sesión en un dispositivo específico
     const logoutDevice = async (deviceId: string) => {
         const userId = localStorage.getItem("userId");
-        const res = await fetch(`http://localhost:8000/api/controlC/devices/logout`, {
+        const res = await fetch(`${BASE_URL}/api/controlC/devices/logout`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ userId, deviceId }),
