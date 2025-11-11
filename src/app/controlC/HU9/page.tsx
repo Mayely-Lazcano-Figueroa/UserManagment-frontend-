@@ -41,11 +41,10 @@ export default function RecuperacionCorreoPage() {
       const data = await res.json();
 
       if (res.ok && data.success) {
-        // 🔒 Guardar correo en sessionStorage (no en URL)
         if (typeof window !== 'undefined') {
           sessionStorage.setItem('servineo_last_email', email);
         }
-        router.push('/controlC/HU9/enlace-enviado'); // sin ?email=...
+        router.push('/controlC/HU9/enlace-enviado');
       } else if (res.status === 404) {
         setError('El correo no está asociado a ninguna cuenta.');
       } else if (res.status === 429) {
@@ -62,29 +61,43 @@ export default function RecuperacionCorreoPage() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-servineo-500 via-servineo-300 to-servineo-400 p-6">
-      <div className="w-full max-w-sm bg-white rounded-3xl shadow-2xl p-8 border border-servineo-100">
-        <h1 className="text-2xl font-semibold text-servineo-500 mb-2">Recuperación de acceso</h1>
-        <p className="text-sm text-gray-700 mb-6">
+    <main className="relative min-h-screen flex items-center justify-center px-6 text-foreground">
+      {/* Fondo ultra sutil (casi plano) */}
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute inset-0 bg-background" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.03] via-transparent to-transparent" />
+        <div className="absolute inset-0 opacity-[0.015] bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMCAwaDIwdjIwSDB6IiBmaWxsPSJub25lIi8+PHBhdGggZD0iTTAgMGgyMHYyMEgweiIgZmlsbD0iIzAwMCIgZmlsbC1vcGFjaXR5PSIwLjA1IiBmaWxsLXJ1bGU9ImV2ZW5vZGQiLz48L3N2Zz4=')]" />
+      </div>
+
+      <div className="w-full max-w-sm bg-card/95 backdrop-blur-sm rounded-3xl shadow-lg p-8 border border-border/70">
+        {/* Título con gradiente leve */}
+        <h1 className="text-2xl font-semibold mb-2 bg-gradient-to-r from-primary/80 to-primary/60 bg-clip-text text-transparent">
+          Recuperación de acceso
+        </h1>
+        <p className="text-sm text-muted-foreground mb-6">
           Te enviaremos un correo electrónico con un enlace para ingresar a tu cuenta.
         </p>
 
         <form onSubmit={handleEnviar} className="flex flex-col gap-4">
-          <label htmlFor="email" className="text-sm font-medium text-gray-700">Correo electrónico</label>
+          <label htmlFor="email" className="text-sm font-medium text-foreground/80">
+            Correo electrónico
+          </label>
           <input
             id="email"
             type="email"
             placeholder="Ingresa tu correo"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full border border-gray-300 rounded-xl p-3.5 text-gray-800 focus:outline-none focus:ring-2 focus:ring-servineo-400 transition"
+            className="w-full rounded-xl p-3.5 text-foreground bg-background border border-border
+                       focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 transition"
             required
             aria-invalid={!!error}
             aria-describedby={error ? 'email-error' : undefined}
+            autoComplete="email"
           />
 
           {error && (
-            <p id="email-error" role="status" aria-live="polite" className="text-sm text-red-500">
+            <p id="email-error" role="status" aria-live="polite" className="text-sm text-destructive">
               {error}
             </p>
           )}
@@ -92,19 +105,18 @@ export default function RecuperacionCorreoPage() {
           <button
             type="submit"
             disabled={!emailValid || loading}
-            className={`w-full font-semibold rounded-xl p-3.5 mt-2 transition-all duration-300 shadow-md
-              ${
-                !emailValid || loading
-                  ? 'bg-servineo-200 text-white cursor-not-allowed'
-                  : 'bg-gradient-to-r from-servineo-500 to-servineo-300 hover:from-servineo-400 hover:to-servineo-200 text-white'
-              }`}
+            className={`w-full font-semibold rounded-xl p-3.5 mt-2 transition-all duration-300
+              ${(!emailValid || loading)
+                ? 'bg-primary/30 text-primary-foreground/70 cursor-not-allowed shadow-none'
+                : 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm hover:shadow'}`
+            }
           >
             {loading ? 'Enviando...' : 'Enviar correo electrónico'}
           </button>
         </form>
 
-        <div className="mt-6 text-center text-sm text-gray-500">
-          <Link href="/controlC/HU4/login" className="text-servineo-400 hover:text-servineo-500 hover:underline">
+        <div className="mt-6 text-center text-sm text-muted-foreground">
+          <Link href="/controlC/HU4/login" className="text-primary hover:underline font-medium">
             Volver al inicio de sesión
           </Link>
         </div>

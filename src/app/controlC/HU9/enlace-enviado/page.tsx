@@ -13,18 +13,22 @@ export default async function Page({
   const token = typeof sp.token === 'string' ? sp.token : undefined;
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-servineo-500 via-servineo-300 to-servineo-400 p-6">
-      <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl p-0 overflow-hidden border border-servineo-100">
-        <div className="bg-gradient-to-r from-servineo-500 to-servineo-300 p-6">
-          <div className="flex items-center gap-3 text-white">
-            <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/15 ring-1 ring-white/30">
-              <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+    <main className="min-h-screen flex items-center justify-center px-6 text-foreground
+      bg-gradient-to-br from-primary/[0.03] via-transparent to-transparent">
+      <div className="w-full max-w-md bg-card/95 backdrop-blur-sm rounded-3xl shadow-lg p-0
+        overflow-hidden border border-border/70">
+        <div className="bg-gradient-to-r from-primary to-primary/90 p-6">
+          <div className="flex items-center gap-3 text-primary-foreground">
+            <span className="inline-flex items-center justify-center w-10 h-10 rounded-full
+              bg-primary-foreground/10 ring-1 ring-primary-foreground/25">
+              <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                 <path d="M20 6L9 17l-5-5" />
               </svg>
             </span>
             <div>
               <h1 className="text-xl font-semibold leading-6">¡Enlace enviado!</h1>
-              <p className="text-white/90 text-sm">
+              <p className="text-primary-foreground/90 text-sm">
                 {email
                   ? <>Revisa <span className="font-medium">{maskEmail(email)}</span> para continuar.</>
                   : 'Revisa tu correo registrado para continuar.'}
