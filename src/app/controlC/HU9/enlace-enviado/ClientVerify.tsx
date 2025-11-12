@@ -3,13 +3,13 @@
 import { useEffect, useMemo, useState } from 'react';
 
 const BASE_API =
-  `${process.env.NEXT_PUBLIC_API_URL}/api/controlC` || 'http://localhost:8000/api/controlC';
+  `${process.env.NEXT_PUBLIC_API_URL}/api/controlC`;
 
 const RESEND_COOLDOWN_MS = 60_000;     // 1 minuto
 const LINK_VALIDITY_SEC = 5 * 60;      // contador visible de 5 minutos
 
 export default function ClientView({ email: emailProp, token }: { email?: string; token?: string }) {
-  // 1) Email: preferir prop; si no hay, recuperar de sessionStorage
+  //  Email: preferir prop; si no hay recuperar de sessionStorage
   const [email, setEmail] = useState<string | undefined>(emailProp);
   useEffect(() => {
     if (!emailProp && typeof window !== 'undefined') {
@@ -18,11 +18,11 @@ export default function ClientView({ email: emailProp, token }: { email?: string
     }
   }, [emailProp]);
 
-  // 2) Estado UI
+  //  Estado UI
   const [info, setInfo] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // 3) Contador visual (5 min)
+  //  Contador visual (5 min)
   const [countdown, setCountdown] = useState<number>(LINK_VALIDITY_SEC);
   useEffect(() => {
     const t = setInterval(() => setCountdown((c) => (c <= 0 ? 0 : c - 1)), 1000);
@@ -31,7 +31,7 @@ export default function ClientView({ email: emailProp, token }: { email?: string
   const minutos = useMemo(() => Math.floor(countdown / 60), [countdown]);
   const segundos = useMemo(() => countdown % 60, [countdown]);
 
-  // 4) Cooldown de reenvío basado en localStorage por correo
+  //  Cooldown de reenvio basado en localStorage por correo
   const [now, setNow] = useState<number>(() => Date.now());
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), 1000);
@@ -50,7 +50,7 @@ export default function ClientView({ email: emailProp, token }: { email?: string
   const canResend = msFromLast >= RESEND_COOLDOWN_MS;
   const secondsToResend = Math.max(0, Math.ceil((RESEND_COOLDOWN_MS - (msFromLast || 0)) / 1000));
 
-  // 5) Acción de reenvío
+  //  Acción de reenvío
   const handleResend = async () => {
     setInfo(null);
 
@@ -95,21 +95,21 @@ export default function ClientView({ email: emailProp, token }: { email?: string
     } finally {
       clearTimeout(fallback);
       setLoading(false);
-      setNow(Date.now()); // fuerza recálculo inmediato
+      setNow(Date.now()); // fuerza recalculo inmediato
     }
   };
 
   return (
     <div className="p-8">
-      <p className="text-sm text-gray-700">
+      <p className="text-sm text-muted-foreground">
         Te enviamos un enlace para ingresar sin contraseña. Por seguridad, el enlace caduca en
         <span className="font-medium"> 5 minutos</span>.
       </p>
 
       <div className="mt-5 flex flex-col items-center gap-2" aria-live="polite">
-        <p className="text-sm text-gray-700">Tiempo restante para usar el enlace:</p>
+        <p className="text-sm text-muted-foreground">Tiempo restante para usar el enlace:</p>
         <div
-          className="px-6 py-2 rounded-full bg-gray-100 ring-1 ring-gray-300 text-3xl font-semibold text-gray-900 tracking-widest tabular-nums shadow-sm"
+          className="px-6 py-2 rounded-full bg-muted ring-1 ring-border text-3xl font-semibold text-foreground tracking-widest tabular-nums shadow-sm"
           title="Tiempo restante"
         >
           {String(minutos).padStart(2, '0')}:{String(segundos).padStart(2, '0')}
@@ -117,35 +117,41 @@ export default function ClientView({ email: emailProp, token }: { email?: string
       </div>
 
       {info && (
-        <div role="status" aria-live="polite" className="mt-4 rounded-xl bg-servineo-100/5 border border-servineo-300/40 text-gray-800 p-3 text-sm">
+        <div
+          role="status"
+          aria-live="polite"
+          className="mt-4 rounded-xl bg-accent/20 border border-accent/40 text-foreground p-3 text-sm"
+        >
           {info}
         </div>
       )}
 
       <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {/* Botón primario coherente con el tema */}
         <button
           onClick={handleResend}
-          // El botón sólo se bloquea por loading o si no tenemos email.
           disabled={loading || !email}
-          className={`rounded-xl p-3.5 font-semibold transition shadow ${
-            loading || !email
-              ? 'bg-servineo-200 text-white cursor-not-allowed'
-              : 'bg-servineo-500 hover:bg-servineo-600 text-white'
-          }`}
+          className={`rounded-xl p-3.5 font-semibold transition
+            ${loading || !email
+              ? 'bg-primary/30 text-primary-foreground/70 cursor-not-allowed shadow-none'
+              : 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm hover:shadow'
+            }`}
           title={!canResend ? `Podrás reenviar en ${secondsToResend}s` : 'Reenviar enlace'}
         >
           {loading ? 'Reenviando…' : !canResend ? `Espera ${secondsToResend}s` : 'Reenviar enlace'}
         </button>
 
+        {/* Botón secundario tipo outline sobre fondo de card */}
         <a
           href="/controlC/HU4/login"
-          className="text-center rounded-xl p-3.5 font-semibold transition shadow bg-white text-servineo-500 hover:text-servineo-600 ring-1 ring-servineo-300 hover:ring-servineo-400"
+          className="text-center rounded-xl p-3.5 font-semibold transition
+                     bg-background text-foreground ring-1 ring-border hover:bg-muted"
         >
           Volver a inicio de sesión
         </a>
       </div>
 
-      <div className="mt-6 text-xs text-gray-600 space-y-1">
+      <div className="mt-6 text-xs text-muted-foreground space-y-1">
         <p>• Revisa la carpeta de <span className="font-medium">Spam</span> o <span className="font-medium">Promociones</span> si no ves el correo.</p>
         <p>• Al generar un nuevo enlace, los anteriores quedan <span className="font-medium">inválidos</span>.</p>
       </div>

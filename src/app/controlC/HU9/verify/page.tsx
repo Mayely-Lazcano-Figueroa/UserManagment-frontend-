@@ -7,7 +7,6 @@ export default async function VerifyPage({
 }: {
   searchParams: Promise<SearchParams>;
 }) {
-  // En Next 15, searchParams es Promise 
   const sp = await searchParams;
   const token = typeof sp.token === 'string' ? sp.token : undefined;
 
