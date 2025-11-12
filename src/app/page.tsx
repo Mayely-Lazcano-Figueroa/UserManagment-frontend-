@@ -78,7 +78,7 @@ export default function HomePage() {
   </div>
 ) : (
   <Link
-    href="./controlC/HU4/login"
+    href="./userManagement/requester/signIn/"
     className="px-6 py-3 text-lg text-white bg-[#2B31E0] rounded-lg font-medium hover:bg-[#1AA7ED] transition cursor-pointer"
   >
     Registrarse

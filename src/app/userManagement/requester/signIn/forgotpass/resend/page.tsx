@@ -1,5 +1,5 @@
 // app/controlC/HU9/enlace-enviado/page.tsx
-import ClientView from './ClientVerify';
+import ClientView from './ClientResend';
 
 type SearchParams = Record<string, string | string[] | undefined>;
 

@@ -143,7 +143,7 @@ export default function ClientView({ email: emailProp, token }: { email?: string
 
         {/* Botón secundario tipo outline sobre fondo de card */}
         <a
-          href="/controlC/HU4/login"
+          href="/userManagement/requester/signIn"
           className="text-center rounded-xl p-3.5 font-semibold transition
                      bg-background text-foreground ring-1 ring-border hover:bg-muted"
         >

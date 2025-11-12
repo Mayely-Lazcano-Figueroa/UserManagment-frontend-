@@ -44,7 +44,7 @@ export default function RecuperacionCorreoPage() {
         if (typeof window !== 'undefined') {
           sessionStorage.setItem('servineo_last_email', email);
         }
-        router.push('/controlC/HU9/enlace-enviado');
+        router.push('/userManagement/requester/signIn/forgotpass/resend');
       } else if (res.status === 404) {
         setError('El correo no está asociado a ninguna cuenta.');
       } else if (res.status === 429) {
@@ -116,7 +116,7 @@ export default function RecuperacionCorreoPage() {
         </form>
 
         <div className="mt-6 text-center text-sm text-muted-foreground">
-          <Link href="/controlC/HU4/login" className="text-primary hover:underline font-medium">
+          <Link href="/userManagement/requester/signIn" className="text-primary hover:underline font-medium">
             Volver al inicio de sesión
           </Link>
         </div>
