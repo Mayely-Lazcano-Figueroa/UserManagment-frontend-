@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { enviarRegistroManual } from "../../../lib/services/RegistrarDPconecionBackend";
 import { generarContrasena } from "../Registrardecoder/generadorContrasena";
 
@@ -19,16 +19,17 @@ export default function RegistroForm() {
   const [cargando, setCargando] = useState(false);
   const [mostrarConfirmarPassword, setMostrarConfirmarPassword] = useState(false);
 
-  // 🔹 Estados de error para nombre y apellido
+  // Estados de error
   const [errorNombre, setErrorNombre] = useState("");
   const [errorApellido, setErrorApellido] = useState("");
 
+  // Validaciones
   const contrasenasCoinciden = password === confirmarPassword;
   const longitudValida = password.length >= 8;
-  // Acepta cualquier correo con formato válido (no solo gmail)
   const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const camposLlenos = nombre && apellido && email && password && confirmarPassword;
-  const formularioValido = camposLlenos && contrasenasCoinciden && longitudValida && emailValido;
+  const formularioValido =
+    camposLlenos && contrasenasCoinciden && longitudValida && emailValido;
 
   const handleGenerarContrasena = () => {
     const nueva = generarContrasena({
@@ -43,7 +44,7 @@ export default function RegistroForm() {
     navigator.clipboard.writeText(nueva);
   };
 
-  // 🔹 Validadores para nombre y apellido
+  // Validadores para nombre y apellido
   const handleNombreChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     if (value.length > 50) {
@@ -71,32 +72,39 @@ export default function RegistroForm() {
   }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      setMensaje("");
-      if (!formularioValido) return;
+    e.preventDefault();
+    setMensaje("");
 
-      setCargando(true);
-      const nombreCompleto: string = `${nombre.trim()} ${apellido.trim()}`;
+    if (!formularioValido) return;
+    setCargando(true);
 
-      try {
-        const data: RegistroResponse = await enviarRegistroManual(nombreCompleto, email, password);
-        if (data.success) {
-          setMensaje("Registro exitoso");
-          if (data.token) localStorage.setItem("servineo_token", data.token);
-          sessionStorage.setItem(
-            "toastMessage",
-            `¡Cuenta Creada Exitosamente! ¡Bienvenido, ${nombreCompleto}!`
-          );
-          router.push("../HU1/FotoPerfil");
-        } else {
-          setMensaje(` ${data.message || "Error al registrar el usuario."}`);
-        }
-      } catch {
-        setMensaje(" Ocurrió un error al conectar con el servidor.");
-      } finally {
-        setCargando(false);
+    const nombreCompleto: string = `${nombre.trim()} ${apellido.trim()}`;
+
+    try {
+      const data: RegistroResponse = await enviarRegistroManual(
+        nombreCompleto,
+        email,
+        password
+      );
+
+      if (data.success) {
+        setMensaje("✅ Registro exitoso");
+        if (data.token) localStorage.setItem("servineo_token", data.token);
+
+        sessionStorage.setItem(
+          "toastMessage",
+          `¡Cuenta creada exitosamente! ¡Bienvenido, ${nombreCompleto}!`
+        );
+        router.push("../HU1/FotoPerfil");
+      } else {
+        setMensaje(data.message || "Error al registrar el usuario.");
       }
-    };
+    } catch {
+      setMensaje("Ocurrió un error al conectar con el servidor.");
+    } finally {
+      setCargando(false);
+    }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-5">
@@ -129,9 +137,7 @@ export default function RegistroForm() {
             placeholder="Ingresa tu nombre"
             required
           />
-          {errorNombre && (
-            <p className="text-red-500 text-xs mt-1">{errorNombre}</p>
-          )}
+          {errorNombre && <p className="text-red-500 text-xs mt-1">{errorNombre}</p>}
         </div>
 
         {/* Apellido */}
@@ -161,9 +167,7 @@ export default function RegistroForm() {
             placeholder="Ingresa tu apellido"
             required
           />
-          {errorApellido && (
-            <p className="text-red-500 text-xs mt-1">{errorApellido}</p>
-          )}
+          {errorApellido && <p className="text-red-500 text-xs mt-1">{errorApellido}</p>}
         </div>
       </div>
 
@@ -176,7 +180,7 @@ export default function RegistroForm() {
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="nombre@gmail.com"
+          placeholder="nombre@dominio.com"
           className={`w-full border rounded-xl p-2.5 text-gray-800 focus:outline-none focus:ring-2 transition ${
             email && !emailValido
               ? "border-red-500 focus:ring-red-400"
@@ -184,95 +188,96 @@ export default function RegistroForm() {
           }`}
           required
         />
-
         {email && !emailValido && (
-        <div className="absolute top-full left-0 mt-1 bg-red-50 border border-red-400 text-red-600 text-xs px-3 py-2 rounded-lg shadow-md animate-fade-in z-10">
+          <div className="absolute top-full left-0 mt-1 bg-red-50 border border-red-400 text-red-600 text-xs px-3 py-2 rounded-lg shadow-md animate-fade-in z-10">
             Ingresa un correo electrónico válido (ej: usuario@dominio.com)
-        </div>
-      )}
-
+          </div>
+        )}
       </div>
 
       {/* Contraseña */}
-      {/* (resto de tu código de contraseña y confirmación igual que antes) */}
-      {/* Contraseña */}
-<div className="relative">
-  <label className="block text-sm font-semibold text-gray-600 mb-2">
-    Contraseña*
-  </label>
-  <div className="relative">
-    <input
-      type={mostrarPassword ? "text" : "password"}
-      value={password}
-      onChange={(e) => setPassword(e.target.value)}
-      placeholder="Ingresa tu contraseña"
-      className={`w-full border rounded-xl p-2.5 text-gray-800 focus:outline-none focus:ring-2 transition ${
-        password && !longitudValida
-          ? "border-red-500 focus:ring-red-400"
-          : "border-gray-300 focus:ring-servineo-400"
-      }`}
-      required
-    />
-    <button
-      type="button"
-      onClick={() => setMostrarPassword(!mostrarPassword)}
-      className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
-    >
-      {mostrarPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-    </button>
-  </div>
+      <div className="relative">
+        <label className="block text-sm font-semibold text-gray-600 mb-2">
+          Contraseña*
+        </label>
+        <div className="relative">
+          <input
+            type={mostrarPassword ? "text" : "password"}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Ingresa tu contraseña"
+            className={`w-full border rounded-xl p-2.5 text-gray-800 focus:outline-none focus:ring-2 transition ${
+              password && !longitudValida
+                ? "border-red-500 focus:ring-red-400"
+                : "border-gray-300 focus:ring-servineo-400"
+            }`}
+            required
+          />
+          <button
+            type="button"
+            onClick={() => setMostrarPassword(!mostrarPassword)}
+            className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
+          >
+            {mostrarPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+          </button>
+        </div>
 
-  {!longitudValida && password && (
-    <p className="text-red-500 text-xs mt-1">Debe tener al menos 8 caracteres.</p>
-  )}
+        {!longitudValida && password && (
+          <p className="text-red-500 text-xs mt-1">
+            Debe tener al menos 8 caracteres.
+          </p>
+        )}
 
-  <button
-    type="button"
-    onClick={handleGenerarContrasena}
-    onMouseEnter={() => setMostrarTooltip(true)}
-    onMouseLeave={() => setMostrarTooltip(false)}
-    className="text-sm text-servineo-500 hover:underline mt-1"
-  >
-    Generar contraseña segura
-  </button>
+        <button
+          type="button"
+          onClick={handleGenerarContrasena}
+          onMouseEnter={() => setMostrarTooltip(true)}
+          onMouseLeave={() => setMostrarTooltip(false)}
+          className="text-sm text-servineo-500 hover:underline mt-1"
+        >
+          Generar contraseña segura
+        </button>
 
-  {mostrarTooltip && (
-    <div className="absolute top-full left-0 mt-1 bg-gray-100 border border-gray-300 text-gray-700 text-xs px-3 py-2 rounded-lg shadow-md animate-fade-in z-10">
-      Se copiará automáticamente al portapapeles
-    </div>
-  )}
-</div>
+        {mostrarTooltip && (
+          <div className="absolute top-full left-0 mt-1 bg-gray-100 border border-gray-300 text-gray-700 text-xs px-3 py-2 rounded-lg shadow-md animate-fade-in z-10">
+            Se copiará automáticamente al portapapeles
+          </div>
+        )}
+      </div>
 
-{/* Confirmar contraseña */}
-<div className="relative">
-  <label className="block text-sm font-semibold text-gray-600 mb-2">
-    Confirmar contraseña*
-  </label>
-  <div className="relative">
-    <input
-      type={mostrarConfirmarPassword ? "text" : "password"}
-      value={confirmarPassword}
-      onChange={(e) => setConfirmarPassword(e.target.value)}
-      placeholder="Confirma tu contraseña"
-      className={`w-full border rounded-xl p-2.5 text-gray-800 focus:outline-none focus:ring-2 transition ${
-        confirmarPassword && !contrasenasCoinciden
-          ? "border-red-500 focus:ring-red-400"
-          : "border-gray-300 focus:ring-servineo-400"
-      }`}
-      required
-    />
-    <button
-      type="button"
-      onClick={() => setMostrarConfirmarPassword(!mostrarConfirmarPassword)}
-      className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
-    >
-      {mostrarConfirmarPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-    </button>
-  </div>
-  {!contrasenasCoinciden && confirmarPassword && (
-    <p className="text-red-500 text-xs mt-1">Las contraseñas no coinciden.</p>
-  )}
-</div>
+      {/* Confirmar contraseña */}
+      <div className="relative">
+        <label className="block text-sm font-semibold text-gray-600 mb-2">
+          Confirmar contraseña*
+        </label>
+        <div className="relative">
+          <input
+            type={mostrarConfirmarPassword ? "text" : "password"}
+            value={confirmarPassword}
+            onChange={(e) => setConfirmarPassword(e.target.value)}
+            placeholder="Confirma tu contraseña"
+            className={`w-full border rounded-xl p-2.5 text-gray-800 focus:outline-none focus:ring-2 transition ${
+              confirmarPassword && !contrasenasCoinciden
+                ? "border-red-500 focus:ring-red-400"
+                : "border-gray-300 focus:ring-servineo-400"
+            }`}
+            required
+          />
+          <button
+            type="button"
+            onClick={() =>
+              setMostrarConfirmarPassword(!mostrarConfirmarPassword)
+            }
+            className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
+          >
+            {mostrarConfirmarPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+          </button>
+        </div>
+
+        {!contrasenasCoinciden && confirmarPassword && (
+          <p className="text-red-500 text-xs mt-1">Las contraseñas no coinciden.</p>
+        )}
+      </div>
 
       {/* Mensaje */}
       {mensaje && (
@@ -287,12 +292,19 @@ export default function RegistroForm() {
 
       {/* Botón enviar */}
      <button
-        type="submit"
-        disabled={!formularioValido || cargando}
-        className="w-full bg-gradient-to-r from-servineo-500 to-servineo-300 hover:from-servineo-400 hover:to-servineo-200 text-white font-semibold rounded-xl p-2.5 mt-2 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-60"
-      >
-        {cargando ? "Registrando..." : "Únete"}
-      </button>
+     type="submit"
+       disabled={!formularioValido || cargando}
+       className="w-full flex items-center justify-center gap-2 bg-[#4046ee] hover:bg-[#3d43ff] text-white font-semibold rounded-xl p-2.5 mt-2 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-60"
+        >
+      {cargando ? (
+        <>
+        <Loader2 className="animate-spin w-5 h-5" />
+          Registrando...
+         </>
+       ) : (
+         "Únete"
+       )}
+        </button>
     </form>
   );
 }

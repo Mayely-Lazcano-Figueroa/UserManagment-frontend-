@@ -1,32 +1,22 @@
 'use client';
 import Link from "next/link";
-<<<<<<< HEAD:src/app/controlC/HU3/FormularioRegistro/page.tsx
-import RegistroGoogle from "../components/registro/registroGoogle";
-import RegistroForm from "../../HU1/RegistarFormDP/page";
-import GithubButton from "../../HU7/components/UI/buttonGithub";
-import DiscordButton from "../../HU7/components/UI/buttonDiscord";
-=======
 import RegistroGoogle from "../signUp/registroServicios/registroGoogle";
-import RegistroForm from "../../../controlC/HU1/RequesterForm/page";
+import RegistroForm from "../signUp/RegistarFormDP/page";
 import GithubButton from "@/app/components/auth/botonRegistro/buttonGithub";
 import DiscordButton from "@/app/components/auth/botonRegistro/buttonDiscord";
->>>>>>> c2ac040956675425a48b67875650391d73ef388c:src/app/userManagement/requester/signUp/page.tsx
 
 export default function SignUp() {
   return (
     <section className="flex justify-center items-center min-h-screen bg-gradient-to-b from-white to-blue-50 animate-fadeInUp">
-      <div className="w-full max-w-md bg-white/90 backdrop-blur-xl border border-blue-100 rounded-3xl shadow-xl p-10 transition-all duration-300 hover:shadow-2xl hover:scale-[1.01]">
+      <div className="w-full max-w-sm bg-white/90 backdrop-blur-xl border border-blue-100 rounded-3xl shadow-xl p-10 transition-all duration-300 hover:shadow-2xl hover:scale-[1.01]">
         {/* Título */}
-        <h1 className="text-4xl font-bold text-center text-gray-800 mb-2">
-          Regístrate en{" "}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-400">
-            Servineo
-          </span>
+        <h1 className="text-3xl font-bold text-center mb-2 bg-gradient-to-r from-primary/80 to-primary/60 bg-clip-text text-transparent">
+          Registrate <span className="sr-only">Servineo</span>
         </h1>
 
         {/* Subtítulo */}
         <p className="text-center text-gray-600 mb-8 text-sm">
-          Crea tu cuenta como requester y empieza a publicar tus servicios
+          Modo requester
         </p>
 
         {/* Formulario principal */}
@@ -55,7 +45,7 @@ export default function SignUp() {
           <p>
             Al registrarte aceptas los{" "}
             <Link
-              href="../HU1/RequesterForm/Terminosycondiciones"
+              href="./RegistarFormDP/Terminosycondiciones/page"
               className="underline text-blue-500 hover:text-blue-400 transition"
             >
               términos de uso
@@ -68,7 +58,7 @@ export default function SignUp() {
         <p className="mt-6 text-center text-gray-700 text-sm">
           ¿Ya tienes cuenta?{" "}
           <Link
-            href="../HU4/login"
+            href="../requester/signUp"
             className="text-blue-500 hover:text-blue-400 font-semibold hover:underline transition"
           >
             Inicia sesión

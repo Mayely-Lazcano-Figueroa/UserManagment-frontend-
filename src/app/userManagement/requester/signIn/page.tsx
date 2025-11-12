@@ -153,7 +153,7 @@ export default function LoginPage() {
         <p className="mt-8 text-center text-sm text-muted-foreground">
           ¿No tienes cuenta?{' '}
           <button
-            onClick={() => router.push('../FormularioRegistro')}
+            onClick={() => router.push('../requester/signUp')}
             className="text-primary/90 hover:text-primary font-medium underline-offset-2 hover:underline"
           >
             Regístrate
