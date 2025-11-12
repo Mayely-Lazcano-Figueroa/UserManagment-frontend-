@@ -48,9 +48,11 @@ export default function RequesterEditForm() {
 
   // 🟦 Cargar datos del usuario
   useEffect(() => {
+    let mounted = true
     async function cargarDatos() {
       try {
         const userData = await obtenerDatosUsuarioLogueado()
+        if (!mounted) return
         setTelefono(userData.telefono || '')
         setUbicacion(
           userData.ubicacion || {
@@ -69,25 +71,44 @@ export default function RequesterEditForm() {
           })
         }
       } catch (err: unknown) {
+        if (!mounted) return
         if (err instanceof Error) setError(err.message)
         else setError('Error al cargar tus datos.')
       }
     }
     cargarDatos()
+    return () => {
+      mounted = false
+    }
   }, [])
 
-  // 🟦 Configurar ícono por defecto de Leaflet
+  // 🟦 Configurar ícono por defecto de Leaflet (robusto)
   useEffect(() => {
+    let mounted = true
     if (typeof window !== 'undefined') {
-      import('leaflet').then((L) => {
-        delete (L.Icon.Default.prototype as unknown as { _getIconUrl?: string })
-          ._getIconUrl
-        L.Icon.Default.mergeOptions({
-          iconRetinaUrl: '/marker-icon-2x.png',
-          iconUrl: '/marker-icon.png',
-          shadowUrl: '/marker-shadow.png',
+      import('leaflet')
+        .then((L) => {
+          if (!mounted) return
+          try {
+            // evito warnings si ya fue borrado
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            delete L.Icon.Default.prototype._getIconUrl
+          } catch (e) {
+            // ignore
+          }
+          L.Icon.Default.mergeOptions({
+            iconRetinaUrl: '/marker-icon-2x.png',
+            iconUrl: '/marker-icon.png',
+            shadowUrl: '/marker-shadow.png',
+          })
         })
-      })
+        .catch(() => {
+          console.warn('No se pudo cargar leaflet dinámicamente')
+        })
+    }
+    return () => {
+      mounted = false
     }
   }, [])
 
@@ -108,12 +129,22 @@ export default function RequesterEditForm() {
     setError(null)
   }
 
-  // 🟦 Obtener dirección desde coordenadas
+  // 🟦 Obtener dirección desde coordenadas con timeout y manejo
   async function fetchAddress(lat: number, lng: number): Promise<void> {
     try {
+      const controller = new AbortController()
+      const id = setTimeout(() => controller.abort(), 8000) // timeout 8s
+
       const res = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`
+        `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`,
+        { signal: controller.signal, headers: { 'Accept-Language': 'es' } }
       )
+      clearTimeout(id)
+
+      if (!res.ok) {
+        throw new Error(`Error geocodificando (${res.status})`)
+      }
+
       const data = await res.json()
       const { country, state, road, suburb, city, town } = data.address || {}
 
@@ -124,13 +155,17 @@ export default function RequesterEditForm() {
         departamento: state || '',
         pais: country || '',
       })
-    } catch {
-      setUbicacion((prev) => ({
-        ...prev,
-        lat,
-        lng,
-        direccion: `${lat.toFixed(6)}, ${lng.toFixed(6)}`,
-      }))
+    } catch (e: unknown) {
+      if ((e as any)?.name === 'AbortError') {
+        setError('Tiempo de respuesta agotado al obtener la dirección')
+      } else {
+        setUbicacion((prev) => ({
+          ...prev,
+          lat,
+          lng,
+          direccion: `${lat.toFixed(6)}, ${lng.toFixed(6)}`,
+        }))
+      }
     }
   }
 
