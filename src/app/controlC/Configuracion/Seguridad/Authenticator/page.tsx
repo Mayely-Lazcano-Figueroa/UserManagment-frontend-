@@ -136,9 +136,29 @@ const handleVerify = async (token: string) => {
           <div className="text-center max-w-3xl mx-auto">
             <p className="text-sm text-gray-700 mb-6">
               Primero, descarga Google Authenticator desde{' '}
-              <a className="text-blue-600 underline" href="https://play.google.com/store" target="_blank" rel="noreferrer">Google Play Store</a>{' '}
+<a
+  href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2"
+  target="_blank"
+  rel="noopener noreferrer"
+  onClick={(e) => {
+    e.stopPropagation(); // evita que Next.js o React intercepte el click
+  }}
+  className="text-blue-600 underline hover:text-blue-800"
+>
+  Google Play Store
+</a>
+
               o desde{' '}
-              <a className="text-blue-600 underline" href="https://apps.apple.com" target="_blank" rel="noreferrer">App Store</a> de iOS.
+<a
+  href="https://apps.apple.com/es/app/google-authenticator/id388497605"
+  target="_blank"
+  rel="noopener noreferrer"
+  onClick={(e) => e.stopPropagation()}
+  className="text-blue-600 underline hover:text-blue-800"
+>
+  App Store
+</a>
+
             </p>
 
             {/* Si ya configurado: mostrar card con papelera */}

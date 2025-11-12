@@ -56,7 +56,7 @@ export default function SeguridadPage() {
         >
           <div className="p-2 rounded-md bg-blue-50">
             <img
-              src="/icons/authenticator.png"
+              src="/icons/appauth.png"
               alt="Authenticator"
               className="w-6 h-6 object-contain text-blue-600"
             />
