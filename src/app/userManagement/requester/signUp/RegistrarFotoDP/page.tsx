@@ -4,8 +4,8 @@ import { useState } from "react";
 import { Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { getUserIdFromToken } from "../../../userManagement/requester/signUp/Registrardecoder/getID";
-import { enviarFotoPerfil } from "../service/conecionbackend"; 
+import { getUserIdFromToken } from "../Registrardecoder/getID";
+import { enviarFotoPerfil } from "../../../lib/services/RegistrarDPconecionBackend"; 
 
 export default function FotoPerfil() {
   const router = useRouter();

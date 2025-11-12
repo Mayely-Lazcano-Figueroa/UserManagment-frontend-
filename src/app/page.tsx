@@ -5,8 +5,8 @@ import { useEffect, useState } from 'react';
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Link from 'next/link';
-import UserMenu from "./controlC/HU3/components/UI/menuUsuario";
-import { useAuth } from "./controlC/HU3/hooks/usoAutentificacion";
+import UserMenu from "@/app/components/menuUsuario";
+import { useAuth } from "../app/userManagement/hooks/usoAutentificacion";
 
 export default function HomePage() {
   const { user } = useAuth();

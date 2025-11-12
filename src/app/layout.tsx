@@ -4,7 +4,7 @@ import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { Roboto } from 'next/font/google';
 import './globals.css';
-import { AuthProvider } from "./controlC/HU3/hooks/usoAutentificacion";
+import { AuthProvider } from "../app/userManagement/hooks/usoAutentificacion";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 

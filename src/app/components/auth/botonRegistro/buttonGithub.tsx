@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Github } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { useAuth } from "../../../HU3/hooks/usoAutentificacion";
+import { useAuth } from "../../../userManagement/hooks/usoAutentificacion";
 
 export default function GithubButton() {
   const [loading, setLoading] = useState(false);
@@ -42,11 +42,11 @@ export default function GithubButton() {
             "toastMessage",
             `¡Bienvenido, ${data.user.name}!`
           );
-        }
+        }sessionStorage.setItem("toastMessage", `¡Bienvenido, ${data.user.name}!`);
 
         // Redirigir según si es la primera vez
         if (data.isFirstTime) {
-          router.push("/controlC/HU3/ubicacion");
+          router.push("/userManagement/requester/signUp/registroUbicacion");
         } else {
           router.push("/");
         }

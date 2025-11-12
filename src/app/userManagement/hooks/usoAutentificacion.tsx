@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect } from "react";
-import { verificarSesionBackend, User } from "../services/conexionBackend";
+import { verificarSesionBackend, User } from "../lib/services/registro";
 import { useRouter } from "next/navigation";
 
 interface AuthContextType {

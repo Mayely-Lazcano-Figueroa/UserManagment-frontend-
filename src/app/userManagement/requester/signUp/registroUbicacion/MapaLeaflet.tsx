@@ -7,8 +7,8 @@ import L from "leaflet";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/navigation";
-import { useAuth } from "../hooks/usoAutentificacion";
-import { enviarUbicacion, enviarTokenGoogle } from "../services/conexionBackend";
+import { useAuth } from "../../../hooks/usoAutentificacion";
+import { enviarUbicacion, enviarTokenGoogle } from "../../../lib/services/registro";
 
 const customIcon = new L.Icon({
   iconUrl: "https://cdn-icons-png.flaticon.com/512/684/684908.png",

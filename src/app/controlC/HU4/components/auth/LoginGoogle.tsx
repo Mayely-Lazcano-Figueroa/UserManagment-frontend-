@@ -27,7 +27,7 @@ export default function LoginGoogle({ onMensajeChange }: LoginGoogleProps) {
         localStorage.setItem("servineo_token", res.data.token);
         localStorage.setItem("servineo_user", JSON.stringify(res.data.user));
 
-        // Guardamos mensaje de éxito en sessionStorage para Home
+        // Guardamos mensaje de exito en sessionStorage para Home
         const mensajeExito = res.data?.message || `¡Inicio de sesión exitoso con Google! Bienvenido, ${res.data.user.name}!`;
         sessionStorage.setItem("toastMessage", mensajeExito);
 

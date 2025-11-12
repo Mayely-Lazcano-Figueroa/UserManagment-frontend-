@@ -5,7 +5,7 @@ import { FcGoogle } from "react-icons/fc";
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
-import { vincularGoogle } from "../service/api";
+import { vincularGoogle } from "../../../../lib/services/api";
 
 interface VincularGoogleProps {
    // eslint-disable-next-line @typescript-eslint/no-explicit-any

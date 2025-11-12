@@ -1,9 +1,16 @@
 'use client';
 import Link from "next/link";
+<<<<<<< HEAD:src/app/controlC/HU3/FormularioRegistro/page.tsx
 import RegistroGoogle from "../components/registro/registroGoogle";
 import RegistroForm from "../../HU1/RegistarFormDP/page";
 import GithubButton from "../../HU7/components/UI/buttonGithub";
 import DiscordButton from "../../HU7/components/UI/buttonDiscord";
+=======
+import RegistroGoogle from "../signUp/registroServicios/registroGoogle";
+import RegistroForm from "../../../controlC/HU1/RequesterForm/page";
+import GithubButton from "@/app/components/auth/botonRegistro/buttonGithub";
+import DiscordButton from "@/app/components/auth/botonRegistro/buttonDiscord";
+>>>>>>> c2ac040956675425a48b67875650391d73ef388c:src/app/userManagement/requester/signUp/page.tsx
 
 export default function SignUp() {
   return (

@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Mail } from "lucide-react";
 import { toast } from "sonner";
-import { vincularCorreoContrasena } from "../service/api";
+import { vincularCorreoContrasena } from "../../../../lib/services/api";
 
 interface VincularCorreoProps {
   token: string;

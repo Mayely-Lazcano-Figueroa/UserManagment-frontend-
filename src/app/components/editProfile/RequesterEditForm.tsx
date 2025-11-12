@@ -7,9 +7,8 @@ import dynamic from 'next/dynamic'
 import {
   obtenerDatosUsuarioLogueado,
   actualizarDatosUsuario,
-} from './service/api'
+} from '../../userManagement/lib/services/editNumber'
 
-// 🔹 Importar dinámicamente los componentes de mapa
 const MapContainer = dynamic(
   () => import('react-leaflet').then((m) => m.MapContainer),
   { ssr: false }
@@ -46,7 +45,7 @@ export default function RequesterEditForm() {
   const [isEditingTelefono, setIsEditingTelefono] = useState(false)
   const [mapReady, setMapReady] = useState(false)
 
-  // 🟦 Cargar datos del usuario
+
   useEffect(() => {
     async function cargarDatos() {
       try {
@@ -76,7 +75,6 @@ export default function RequesterEditForm() {
     cargarDatos()
   }, [])
 
-  // 🟦 Configurar ícono por defecto de Leaflet
   useEffect(() => {
     if (typeof window !== 'undefined') {
       import('leaflet').then((L) => {
@@ -91,14 +89,13 @@ export default function RequesterEditForm() {
     }
   }, [])
 
-  // 🟦 Validar teléfono
   function validarTelefono(valor: string): boolean {
     if (valor.length < 8 || valor.length > 15) return false
     if (valor.startsWith('+')) return /^[+][0-9]{7,14}$/.test(valor)
     return /^[0-9]{8,15}$/.test(valor)
   }
 
-  // 🟦 Manejar cambios en teléfono
+
   function handleTelefonoChange(e: React.ChangeEvent<HTMLInputElement>) {
     let valor = e.target.value
     if (valor.startsWith('+')) valor = '+' + valor.slice(1).replace(/[^0-9]/g, '')
@@ -108,7 +105,6 @@ export default function RequesterEditForm() {
     setError(null)
   }
 
-  // 🟦 Obtener dirección desde coordenadas
   async function fetchAddress(lat: number, lng: number): Promise<void> {
     try {
       const res = await fetch(
@@ -134,7 +130,6 @@ export default function RequesterEditForm() {
     }
   }
 
-  // 🟦 Obtener ubicación actual
   function handleGetLocation(): void {
     if (!navigator.geolocation) {
       setError('Tu navegador no soporta geolocalización')
@@ -152,7 +147,6 @@ export default function RequesterEditForm() {
     )
   }
 
-  // 🟦 Componente de marcador dinámico
   const LocationMarker = dynamic(
     async () => {
       const { useMap, useMapEvents, Marker } = await import('react-leaflet')
@@ -188,7 +182,6 @@ export default function RequesterEditForm() {
     { ssr: false }
   )
 
-  // 🟦 Guardar cambios
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault()
     if (loading) return
@@ -229,9 +222,8 @@ export default function RequesterEditForm() {
       className="space-y-6 max-w-2xl mx-auto bg-white rounded-2xl p-8"
       aria-busy={loading}
     >
-      {/* Teléfono */}
       <div>
-        <label className="block text-sm font-semibold mb-1 text-[#1A223F]">
+        <label className="block text-sm font-semibold mb-1 text-[#1A223F] text-left">
           Número de teléfono:
         </label>
         <div className="flex items-center gap-2">
@@ -277,9 +269,8 @@ export default function RequesterEditForm() {
         )}
       </div>
 
-      {/* Ubicación */}
       <div>
-        <label className="block text-sm font-semibold mb-1 text-[#1A223F]">
+        <label className="block text-sm font-semibold mb-1 text-[#1A223F] text-left">
           Ubicación:
         </label>
         <div className="flex items-center gap-2">
@@ -302,7 +293,6 @@ export default function RequesterEditForm() {
         </span>
       </div>
 
-      {/* Mapa */}
       <div>
         <label className="block text-sm font-semibold mb-1 text-[#1A223F]">
           Mapa
@@ -336,14 +326,12 @@ export default function RequesterEditForm() {
         </div>
       </div>
 
-      {/* Errores */}
       {error && (
         <p className="text-sm text-red-600" role="alert">
           {error}
         </p>
       )}
 
-      {/* Botones */}
       <div className="pt-4 flex justify-end gap-3">
         <button
           type="submit"

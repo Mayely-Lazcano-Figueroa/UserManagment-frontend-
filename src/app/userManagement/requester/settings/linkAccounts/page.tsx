@@ -8,10 +8,10 @@ import {
   obtenerMetodosCliente,
   desvincularMetodo,
   AuthProvider,
-} from "../service/api";
-import VincularCorreo from "../vinculos/vincularCorreo";
-import VincularGoogle from "../vinculos/vincularGoogle";
-import VincularGithub from "../vinculos/vincularGithub";
+} from "../../../lib/services/api";
+import VincularCorreo from "../linkAccounts/vinculoCuenta/vincularCorreo";
+import VincularGoogle from "../linkAccounts/vinculoCuenta/vincularGoogle";
+import VincularGithub from "../linkAccounts/vinculoCuenta/vincularGithub";
 
 
 interface Props {
