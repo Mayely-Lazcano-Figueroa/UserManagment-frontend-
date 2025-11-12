@@ -1,4 +1,4 @@
-const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/api/controlC`;
+const BASE_URL = 'http://localhost:8000'; 
 
 export interface ChangePasswordRequest {
   currentPassword: string;
@@ -9,6 +9,7 @@ export interface ChangePasswordRequest {
 export interface ChangePasswordResponse {
   success: boolean;
   message: string;
+  forceLogout?: boolean; // ← NUEVO: para manejar bloqueo
 }
 
 export async function cambiarContrasena(
@@ -21,8 +22,10 @@ export async function cambiarContrasena(
   }
 
   try {
-    // 🔧 URL limpia sin espacios ni saltos de línea
-    const url = `${API_URL}/cambiar-contrasena/change-password`.trim();
+    console.log('🔐 Intentando cambiar contraseña...');
+    
+    // ✅ URL corregida
+    const url = `${BASE_URL}/api/controlC/cambiar-contrasena/change-password`;
     
     console.log('🌐 URL final:', url);
     
@@ -35,17 +38,34 @@ export async function cambiarContrasena(
       body: JSON.stringify(data),
     });
 
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      throw new Error(error.message || `Error ${response.status}: No se pudo cambiar la contraseña`);
+    const result: ChangePasswordResponse = await response.json();
+    console.log('📡 Resultado del servidor:', result);
+
+    // 🚪 MANEJAR CIERRE FORZADO DE SESIÓN (BLOQUEO)
+    if (result.forceLogout) {
+      console.log("🚨 Sesión cerrada por seguridad - demasiados intentos fallidos");
+      
+      // Limpiar sesión
+      localStorage.removeItem("servineo_token");
+      localStorage.removeItem("servineo_user");
+      
+      // Mostrar alerta
+      alert(`🔒 ${result.message}\n\nSerás redirigido al inicio de sesión.`);
+      
+      // Redirigir al login
+      window.location.href = "/";
+      
+      return result;
     }
 
-    const result: ChangePasswordResponse = await response.json();
+    // Para otros errores
+    if (!response.ok && response.status !== 423) {
+      throw new Error(result.message || `Error ${response.status}: No se pudo cambiar la contraseña`);
+    }
+
     return result;
-  } 
-   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  catch (error: any) {
-    console.error("Error al cambiar contraseña:", error);
+  } catch (error: any) {
+    console.error("❌ Error al cambiar contraseña:", error);
     throw error;
   }
 }

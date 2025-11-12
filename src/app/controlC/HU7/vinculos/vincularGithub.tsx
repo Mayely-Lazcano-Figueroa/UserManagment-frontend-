@@ -52,7 +52,7 @@ export default function VincularGithub({ onLinked }: VincularGithubProps) {
         <button
           onClick={handleVincularGitHub}
           disabled={loading}
-          className="flex items-center justify-center gap-2 bg-gray-800 text-white text-sm px-4 py-2 rounded-xl hover:bg-gray-900 transition disabled:opacity-60"
+          className="flex items-center justify-center gap-2 bg-blue-600 text-white text-sm px-4 py-2 rounded-xl hover:bg-blue-700 transition disabled:opacity-60"
         >
           {loading ? (
             <>
