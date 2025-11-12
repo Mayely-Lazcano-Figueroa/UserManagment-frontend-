@@ -72,10 +72,10 @@ export default function UserMenu({ open: openProp, onToggle }: Props) {
                 onClick={() => {
                    if (isControlled) {
                     onToggle && onToggle();
-                    router.push("/controlC/Configuracion");
+                    router.push("/userManagement/requester/settings");
                   } else {
                     setOpenInternal(false);
-                    router.push("/controlC/Configuracion");
+                    router.push("/userManagement/requester/settings");
                   }
                 }}
               >

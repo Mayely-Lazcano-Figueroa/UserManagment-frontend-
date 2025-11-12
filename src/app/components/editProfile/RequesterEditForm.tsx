@@ -7,7 +7,7 @@ import dynamic from 'next/dynamic'
 import {
   obtenerDatosUsuarioLogueado,
   actualizarDatosUsuario,
-} from './service/api'
+} from '../../userManagement/lib/services/editNumber'
 
 // 🔹 Importar dinámicamente los componentes de mapa
 const MapContainer = dynamic(
@@ -231,7 +231,7 @@ export default function RequesterEditForm() {
     >
       {/* Teléfono */}
       <div>
-        <label className="block text-sm font-semibold mb-1 text-[#1A223F]">
+        <label className="block text-sm font-semibold mb-1 text-[#1A223F] text-left">
           Número de teléfono:
         </label>
         <div className="flex items-center gap-2">
@@ -279,7 +279,7 @@ export default function RequesterEditForm() {
 
       {/* Ubicación */}
       <div>
-        <label className="block text-sm font-semibold mb-1 text-[#1A223F]">
+        <label className="block text-sm font-semibold mb-1 text-[#1A223F] text-left">
           Ubicación:
         </label>
         <div className="flex items-center gap-2">

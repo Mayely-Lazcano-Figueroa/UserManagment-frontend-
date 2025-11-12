@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { cambiarContrasena } from './service/editPassword';
-import { cerrarTodasSesiones } from './service/logoutService';
+import { cambiarContrasena } from '../../userManagement/lib/services/editPassword';
+import { cerrarTodasSesiones } from '../../userManagement/lib/services/logoutService';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
-import { obtenerUltimoCambio } from './service/getLastChange';
+import { obtenerUltimoCambio } from '../../userManagement/lib/services/getLastChange';
 
 type Props = {
   onCancel?: () => void;
@@ -171,7 +171,7 @@ export default function ChangePasswordForm({ onCancel, onSaved }: Props) {
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         {/* Contraseña actual */}
         <div>
-          <label htmlFor="currentPassword" className="block text-sm font-semibold text-[#1A223F] mb-2">
+          <label htmlFor="currentPassword" className="block text-sm font-semibold text-[#1A223F] mb-2 text-left">
             Contraseña actual
           </label>
           <div className="relative">
@@ -197,8 +197,8 @@ export default function ChangePasswordForm({ onCancel, onSaved }: Props) {
 
         {/* Nueva contraseña */}
         <div>
-          <label htmlFor="newPassword" className="block text-sm font-semibold text-[#1A223F] mb-2">
-            Contraseña nueva
+          <label htmlFor="newPassword" className="block text-sm font-semibold text-[#1A223F] mb-2 text-left">
+            Nueva contraseña
           </label>
           <div className="relative">
             <input
@@ -224,7 +224,7 @@ export default function ChangePasswordForm({ onCancel, onSaved }: Props) {
         {/* Confirmar nueva contraseña */}
         <div>
           <label htmlFor="confirmPassword" className="block text-sm font-semibold text-[#1A223F] mb-2">
-            Confirmar nueva contraseña
+            
           </label>
           <div className="relative">
             <input
