@@ -4,7 +4,7 @@ import { useState } from "react";
 import { FaGithub } from "react-icons/fa";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
-import { vincularGitHub } from "../service/api";
+import { vincularGitHub } from "../../../../lib/services/api";
 
 interface VincularGithubProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

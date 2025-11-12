@@ -1,11 +1,10 @@
 "use client";
 
-import GoogleButton from "../UI/buttonGoogle";
-import { enviarTokenGoogle, GoogleAuthResponse } from "../../services/conexionBackend";
+import GoogleButton from "@/app/components/auth/botonRegistro/buttonGoogle";
+import { enviarTokenGoogle, GoogleAuthResponse } from "../../../lib/services/registro";
 import { useRouter } from "next/navigation";
-import { useAuth } from "../../hooks/usoAutentificacion";
+import { useAuth } from "../../../hooks/usoAutentificacion";
 import { CredentialResponse } from "@react-oauth/google";
-
 export default function RegistroGoogle({ onSuccessClose }: { onSuccessClose?: () => void }) {
   const router = useRouter();
   const { setUser } = useAuth();
@@ -25,7 +24,7 @@ export default function RegistroGoogle({ onSuccessClose }: { onSuccessClose?: ()
 
       if (data.firstTime) {
         sessionStorage.setItem("google_token_temp", token);
-        router.push("../HU3/ubicacion");
+        router.push("../registroUbicacion");
         return;
       }
 

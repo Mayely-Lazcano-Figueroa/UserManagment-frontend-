@@ -3,9 +3,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
-import { useAuth } from '../../../controlC/HU3/hooks/usoAutentificacion';
-import UserMenu from '../../../controlC/HU3/components/UI/menuUsuario';
-import AccountLoginSettings from '../../../controlC/HU7/registrarVinculo/page';
+import { useAuth } from '../../hooks/usoAutentificacion';
+import UserMenu from '@/app/components/menuUsuario';
+import AccountLoginSettings from '../settings/linkAccounts/page';
 import RequesterEditForm from '../../../components/editProfile/RequesterEditForm';
 import ChangePasswordForm from '../../../components/editProfile/ChangePasswordForm';
 import { obtenerDatosUsuarioLogueado } from '../../lib/services/editNumber';

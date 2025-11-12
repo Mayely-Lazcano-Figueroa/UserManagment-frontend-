@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from "react";
-import { useAuth } from "../../hooks/usoAutentificacion";
+import { useAuth } from "../userManagement/hooks/usoAutentificacion";
 import { useRouter } from "next/navigation";
 
 type Props = {

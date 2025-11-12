@@ -4,7 +4,7 @@ import { api, ApiResponse } from '../lib/api';
 import { Eye, EyeOff } from 'lucide-react';
 import LoginGoogle from "../components/auth/LoginGoogle";
 import { useRouter } from 'next/navigation';
-import { useAuth } from '../../HU3/hooks/usoAutentificacion';
+import { useAuth } from '@/app/userManagement/hooks/usoAutentificacion';
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Link from 'next/link';
@@ -153,7 +153,7 @@ export default function LoginPage() {
         <p className="mt-8 text-center text-sm text-muted-foreground">
           ¿No tienes cuenta?{' '}
           <button
-            onClick={() => router.push('../HU3/FormularioRegistro')}
+            onClick={() => router.push('../../userManagement/requester/signUp')}
             className="text-primary/90 hover:text-primary font-medium underline-offset-2 hover:underline"
           >
             Regístrate

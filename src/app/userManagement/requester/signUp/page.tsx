@@ -1,9 +1,9 @@
 'use client';
 import Link from "next/link";
-import RegistroGoogle from "../components/registro/registroGoogle";
-import RegistroForm from "../../HU1/RequesterForm/page";
-import GithubButton from "../../HU7/components/UI/buttonGithub";
-import DiscordButton from "../../HU7/components/UI/buttonDiscord";
+import RegistroGoogle from "../signUp/registroServicios/registroGoogle";
+import RegistroForm from "../../../controlC/HU1/RequesterForm/page";
+import GithubButton from "@/app/components/auth/botonRegistro/buttonGithub";
+import DiscordButton from "@/app/components/auth/botonRegistro/buttonDiscord";
 
 export default function SignUp() {
   return (
