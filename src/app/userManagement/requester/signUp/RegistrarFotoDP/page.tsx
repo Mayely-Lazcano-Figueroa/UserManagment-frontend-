@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { getUserIdFromToken } from "../decoder/getID";
+import { getUserIdFromToken } from "../../../userManagement/requester/signUp/Registrardecoder/getID";
 import { enviarFotoPerfil } from "../service/conecionbackend"; 
 
 export default function FotoPerfil() {

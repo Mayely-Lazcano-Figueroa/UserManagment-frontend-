@@ -175,7 +175,7 @@ export default function SeguridadPage() {
 
               {/* Dispositivos vinculados */}
               <button
-                onClick={() => router.push('/controlC/HU6/closeSession')}
+                onClick={() => router.push('')}
                 className="flex items-center gap-3 px-6 py-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ease-out bg-white text-gray-800 cursor-pointer min-w-[220px]"
               >
                 <div className="p-2 rounded-md bg-blue-50">

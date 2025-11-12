@@ -1,7 +1,7 @@
 'use client';
 import Link from "next/link";
 import RegistroGoogle from "../components/registro/registroGoogle";
-import RegistroForm from "../../HU1/RequesterForm/page";
+import RegistroForm from "../../HU1/RegistarFormDP/page";
 import GithubButton from "../../HU7/components/UI/buttonGithub";
 import DiscordButton from "../../HU7/components/UI/buttonDiscord";
 

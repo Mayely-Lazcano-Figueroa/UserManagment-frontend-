@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
-import { enviarRegistroManual } from "../service/conecionbackend";
-import { generarContrasena } from "../decoder/generadorContrasena";
+import { enviarRegistroManual } from "../../../lib/services/RegistrarDPconecionBackend";
+import { generarContrasena } from "../Registrardecoder/generadorContrasena";
 
 export default function RegistroForm() {
   const router = useRouter();
@@ -25,7 +25,8 @@ export default function RegistroForm() {
 
   const contrasenasCoinciden = password === confirmarPassword;
   const longitudValida = password.length >= 8;
-  const emailValido = /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(email);
+  // Acepta cualquier correo con formato válido (no solo gmail)
+  const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const camposLlenos = nombre && apellido && email && password && confirmarPassword;
   const formularioValido = camposLlenos && contrasenasCoinciden && longitudValida && emailValido;
 
@@ -185,10 +186,11 @@ export default function RegistroForm() {
         />
 
         {email && !emailValido && (
-          <div className="absolute top-full left-0 mt-1 bg-red-50 border border-red-400 text-red-600 text-xs px-3 py-2 rounded-lg shadow-md animate-fade-in z-10">
-            Solo se permiten correos @gmail.com
-          </div>
-        )}
+        <div className="absolute top-full left-0 mt-1 bg-red-50 border border-red-400 text-red-600 text-xs px-3 py-2 rounded-lg shadow-md animate-fade-in z-10">
+            Ingresa un correo electrónico válido (ej: usuario@dominio.com)
+        </div>
+      )}
+
       </div>
 
       {/* Contraseña */}
@@ -284,7 +286,7 @@ export default function RegistroForm() {
       )}
 
       {/* Botón enviar */}
-      <button
+     <button
         type="submit"
         disabled={!formularioValido || cargando}
         className="w-full bg-gradient-to-r from-servineo-500 to-servineo-300 hover:from-servineo-400 hover:to-servineo-200 text-white font-semibold rounded-xl p-2.5 mt-2 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-60"
