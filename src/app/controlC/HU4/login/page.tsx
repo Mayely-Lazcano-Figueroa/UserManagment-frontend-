@@ -8,6 +8,7 @@ import { useAuth } from '../../HU3/hooks/usoAutentificacion';
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AuthenticatorSesion from '../../Configuracion/Seguridad/components/AuthenticatorSesionModal';
+import AuthenticatorTOTPModal from '../../Configuracion/Seguridad/components/AuthenticatorTOTPModal';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -15,8 +16,8 @@ export default function LoginPage() {
   const [mostrarPass, setMostrarPass] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const [showModal, setShowModal] = useState(false);
-  const [emailSinPass, setEmailSinPass] = useState('');
+  const [modalActivo, setModalActivo] = useState<'ninguno' | 'sesion' | 'totp'>('ninguno');
+  const [emailTOTP, setEmailTOTP] = useState(''); // correo solo para flujo TOTP
 
   const router = useRouter();
   const { setUser } = useAuth();
@@ -65,7 +66,6 @@ export default function LoginPage() {
         <p className="text-center text-sm text-gray-500 mb-8">Modo requester</p>
 
         <form onSubmit={manejarLogin} className="flex flex-col gap-5">
-          {/* Correo */}
           <div>
             <label className="block text-sm font-semibold text-gray-600 mb-2">
               Correo electrónico*
@@ -80,7 +80,6 @@ export default function LoginPage() {
             />
           </div>
 
-          {/* Contraseña */}
           <div>
             <label className="block text-sm font-semibold text-gray-600 mb-2">
               Contraseña*
@@ -104,18 +103,16 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Ingresar sin contraseña */}
           <p className="mt-2 text-left text-sm text-gray-500">
             <button
               type="button"
-              onClick={() => setShowModal(true)}
+              onClick={() => setModalActivo('sesion')}
               className="text-servineo-400 hover:text-servineo-500 font-medium hover:underline transition"
             >
               Ingresar sin contraseña
             </button>
           </p>
 
-          {/* Botón ingresar */}
           <button
             type="submit"
             disabled={loading}
@@ -125,14 +122,12 @@ export default function LoginPage() {
           </button>
         </form>
 
-        {/* Separador */}
         <div className="flex items-center my-8">
           <div className="flex-1 h-px bg-gray-300"></div>
           <span className="px-2 text-gray-400 text-sm">o</span>
           <div className="flex-1 h-px bg-gray-300"></div>
         </div>
 
-        {/* Botón Google */}
         <div className="mt-4">
           <LoginGoogle
             onMensajeChange={(msg, tipo) =>
@@ -143,7 +138,6 @@ export default function LoginPage() {
           />
         </div>
 
-        {/* Registro */}
         <p className="mt-8 text-center text-sm text-gray-500">
           ¿No tienes cuenta?{' '}
           <button
@@ -155,15 +149,27 @@ export default function LoginPage() {
         </p>
       </div>
 
-      {/* Modal de Authenticator*/}
-      <AuthenticatorSesion
-        showModal={showModal}
-        setShowModal={setShowModal}
-        email={emailSinPass}
-        setEmail={setEmailSinPass}
-      />
+      {/* Modal Sesión */}
+      {modalActivo === 'sesion' && (
+        <AuthenticatorSesion
+          showModal={true}
+          setShowModal={() => setModalActivo('ninguno')}
+          emailTOTP={emailTOTP}
+          setEmailTOTP={setEmailTOTP}
+          abrirTOTP={() => setModalActivo('totp')}
+        />
+      )}
 
-      {/* Contenedor Toastify */}
+      {/* Modal TOTP */}
+      {modalActivo === 'totp' && (
+        <AuthenticatorTOTPModal
+          showModal={true}
+          setShowModal={() => setModalActivo('ninguno')}
+          regresarSesionModal={() => setModalActivo('sesion')}
+          email={emailTOTP}
+        />
+      )}
+
       <ToastContainer />
     </main>
   );
