@@ -51,7 +51,7 @@ export default function LoginPage() {
         });
       }
 
-    } 
+    }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     catch (err: any) {
       toast.error(`Error: ${err?.message ?? 'No se pudo conectar con el servidor.'}`, {
@@ -67,9 +67,9 @@ export default function LoginPage() {
   return (
     <main className="min-h-screen flex items-center justify-center 
       bg-gradient-to-br from-servineo-500 via-servineo-300 to-servineo-400 p-6">
-      
+
       <div className="w-full max-w-sm bg-white rounded-3xl shadow-xl p-10 border border-servineo-100">
-        
+
         <h1 className="text-3xl font-bold text-center text-servineo-500 mb-2">
           Iniciar sesión <span className="text-servineo-400">Servineo</span>
         </h1>
@@ -119,6 +119,17 @@ export default function LoginPage() {
               </button>
             </div>
           </div>
+
+          {/*  texto: Ingresar sin contraseña */}
+          <p className="mt-2 text-left text-sm text-gray-500">
+            <button
+              type="button"
+              onClick={() => router.push('/controlC/HU4/login-sin-password')}
+              className="text-servineo-400 hover:text-servineo-500 font-medium hover:underline transition"
+            >
+              Ingresar sin contraseña
+            </button>
+          </p>
 
           {/* Botón ingresar */}
           <button
