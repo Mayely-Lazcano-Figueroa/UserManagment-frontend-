@@ -13,6 +13,10 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [mostrarPass, setMostrarPass] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const [showModal, setShowModal] = useState(false); // estado para el modal
+  const [emailSinPass, setEmailSinPass] = useState(''); // email del modal
+
   const router = useRouter();
   const { setUser } = useAuth();
 
@@ -21,7 +25,6 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const res: ApiResponse<any> = await api.post('/auth/login', { email, password });
 
       if (res.success && res.data) {
@@ -31,12 +34,10 @@ export default function LoginPage() {
         localStorage.setItem("servineo_user", JSON.stringify(data.user));
         setUser(data.user);
 
-        // Guardamos mensaje de éxito en sessionStorage para Home
         const mensajeExito = data.message || `¡Cuenta Creada Exitosamente! Bienvenido, ${data.user.name}!`;
         sessionStorage.setItem("toastMessage", mensajeExito);
 
         router.push('/');
-
       } else {
         const mensajeError =
           res.message ||
@@ -51,9 +52,7 @@ export default function LoginPage() {
         });
       }
 
-    }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    catch (err: any) {
+    } catch (err: any) {
       toast.error(`Error: ${err?.message ?? 'No se pudo conectar con el servidor.'}`, {
         position: "top-center",
         autoClose: 3000,
@@ -120,11 +119,11 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/*  texto: Ingresar sin contraseña */}
+          {/* Texto: Ingresar sin contraseña */}
           <p className="mt-2 text-left text-sm text-gray-500">
             <button
               type="button"
-              onClick={() => router.push('/controlC/HU4/login-sin-password')}
+              onClick={() => setShowModal(true)}
               className="text-servineo-400 hover:text-servineo-500 font-medium hover:underline transition"
             >
               Ingresar sin contraseña
@@ -157,7 +156,7 @@ export default function LoginPage() {
             onMensajeChange={(msg, tipo) =>
               tipo === 'error'
                 ? toast.error(msg, { position: 'top-center', theme: 'colored' })
-                : null // éxito ya se guarda en sessionStorage
+                : null
             }
           />
         </div>
@@ -173,6 +172,66 @@ export default function LoginPage() {
           </button>
         </p>
       </div>
+
+      {/* Modal de Authenticator */}
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="bg-white w-[520px] rounded-lg shadow-lg p-8">
+
+            {/* Título Servineo */}
+            <h2 className="text-3xl font-bold text-center text-servineo-500 mb-1">
+              <span className="text-servineo-400">Servineo</span>
+            </h2>
+
+            {/* Subtítulo */}
+            <p className="text-2xl font-bold text-center text-servineo-500 mb-6">
+              Authenticator App
+            </p>
+
+            {/* Textos alineados a la izquierda */}
+            <p className="block text-sm font-semibold text-gray-600 mb-2">
+              Debe de tener configurado su app Authenticator
+            </p>
+            <p className="block text-sm font-semibold text-gray-600 mb-4">
+              Para el ingreso sin contraseña, ingrese su correo electrónico
+            </p>
+
+            {/* Etiqueta correo */}
+            <label className="block text-sm font-semibold text-gray-600 mb-2">
+              Correo electrónico*
+            </label>
+
+            {/* Input centrado */}
+            <input
+              type="email"
+              value={emailSinPass}
+              onChange={(e) => setEmailSinPass(e.target.value)}
+              placeholder="Ingrese su correo electrónico"
+              className="w-full border border-gray-300 rounded-xl p-3.5 text-gray-800 focus:outline-none focus:ring-2 focus:ring-servineo-400 transition mb-6"
+            />
+
+            {/* Botones */}
+            <div className="mt-6 flex justify-end gap-3">
+              {/* Cancelar */}
+              <button
+                onClick={() => setShowModal(false)}
+                className="flex-1 rounded-md bg-[#E5F4FB] px-4 py-2 text-[#1A223F] font-semibold hover:bg-[#2BDDE0]/20"
+              >
+                Cancelar
+              </button>
+
+              {/* Continuar */}
+              <button
+                onClick={() => {}}
+                className="flex-1 rounded-md bg-[#1A223F] px-4 py-2 text-white font-semibold hover:bg-[#2B31E0]"
+              >
+                Continuar
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
 
       {/* Contenedor Toastify */}
       <ToastContainer />
