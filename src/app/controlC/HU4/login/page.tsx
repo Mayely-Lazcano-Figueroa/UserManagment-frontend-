@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '../../HU3/hooks/usoAutentificacion';
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import AuthenticatorSesion from '../../Configuracion/Seguridad/components/AuthenticatorSesionModal';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -14,8 +15,8 @@ export default function LoginPage() {
   const [mostrarPass, setMostrarPass] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const [showModal, setShowModal] = useState(false); // estado para el modal
-  const [emailSinPass, setEmailSinPass] = useState(''); // email del modal
+  const [showModal, setShowModal] = useState(false);
+  const [emailSinPass, setEmailSinPass] = useState('');
 
   const router = useRouter();
   const { setUser } = useAuth();
@@ -29,7 +30,6 @@ export default function LoginPage() {
 
       if (res.success && res.data) {
         const data = res.data;
-
         localStorage.setItem("servineo_token", data.token);
         localStorage.setItem("servineo_user", JSON.stringify(data.user));
         setUser(data.user);
@@ -44,28 +44,18 @@ export default function LoginPage() {
           res.data?.message ||
           res.error ||
           'Credenciales inválidas o error en el servidor.';
-
-        toast.error(mensajeError, {
-          position: "top-center",
-          autoClose: 3000,
-          theme: "colored",
-        });
+        toast.error(mensajeError, { position: "top-center", autoClose: 3000, theme: "colored" });
       }
 
     } catch (err: any) {
-      toast.error(`Error: ${err?.message ?? 'No se pudo conectar con el servidor.'}`, {
-        position: "top-center",
-        autoClose: 3000,
-        theme: "colored",
-      });
+      toast.error(`Error: ${err?.message ?? 'No se pudo conectar con el servidor.'}`, { position: "top-center", autoClose: 3000, theme: "colored" });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center 
-      bg-gradient-to-br from-servineo-500 via-servineo-300 to-servineo-400 p-6">
+    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-servineo-500 via-servineo-300 to-servineo-400 p-6">
 
       <div className="w-full max-w-sm bg-white rounded-3xl shadow-xl p-10 border border-servineo-100">
 
@@ -85,9 +75,7 @@ export default function LoginPage() {
               placeholder="Ingrese su correo"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full border border-gray-300 rounded-xl p-3.5 text-gray-800 
-                focus:outline-none focus:ring-2 focus:ring-servineo-400 
-                focus:border-servineo-300 transition"
+              className="w-full border border-gray-300 rounded-xl p-3.5 text-gray-800 focus:outline-none focus:ring-2 focus:ring-servineo-400 focus:border-servineo-300 transition"
               required
             />
           </div>
@@ -103,23 +91,20 @@ export default function LoginPage() {
                 placeholder="Ingrese su contraseña"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full border border-gray-300 rounded-xl p-3.5 pr-10 
-                  text-gray-800 focus:outline-none focus:ring-2 
-                  focus:ring-servineo-400 transition"
+                className="w-full border border-gray-300 rounded-xl p-3.5 pr-10 text-gray-800 focus:outline-none focus:ring-2 focus:ring-servineo-400 transition"
                 required
               />
               <button
                 type="button"
                 onClick={() => setMostrarPass(!mostrarPass)}
-                className="absolute inset-y-0 right-3 flex items-center 
-                  text-gray-400 hover:text-servineo-400 transition"
+                className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-servineo-400 transition"
               >
                 {mostrarPass ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
           </div>
 
-          {/* Texto: Ingresar sin contraseña */}
+          {/* Ingresar sin contraseña */}
           <p className="mt-2 text-left text-sm text-gray-500">
             <button
               type="button"
@@ -134,10 +119,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-servineo-500 to-servineo-300 
-              hover:from-servineo-400 hover:to-servineo-200 text-white 
-              font-semibold rounded-xl p-3.5 mt-2 transition-all 
-              duration-300 shadow-md hover:shadow-lg disabled:opacity-60"
+            className="w-full bg-gradient-to-r from-servineo-500 to-servineo-300 hover:from-servineo-400 hover:to-servineo-200 text-white font-semibold rounded-xl p-3.5 mt-2 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-60"
           >
             {loading ? 'Ingresando...' : 'Ingresar'}
           </button>
@@ -173,65 +155,13 @@ export default function LoginPage() {
         </p>
       </div>
 
-      {/* Modal de Authenticator */}
-      {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-          <div className="bg-white w-[520px] rounded-lg shadow-lg p-8">
-
-            {/* Título Servineo */}
-            <h2 className="text-3xl font-bold text-center text-servineo-500 mb-1">
-              <span className="text-servineo-400">Servineo</span>
-            </h2>
-
-            {/* Subtítulo */}
-            <p className="text-2xl font-bold text-center text-servineo-500 mb-6">
-              Authenticator App
-            </p>
-
-            {/* Textos alineados a la izquierda */}
-            <p className="block text-sm font-semibold text-gray-600 mb-2">
-              Debe de tener configurado su app Authenticator
-            </p>
-            <p className="block text-sm font-semibold text-gray-600 mb-4">
-              Para el ingreso sin contraseña, ingrese su correo electrónico
-            </p>
-
-            {/* Etiqueta correo */}
-            <label className="block text-sm font-semibold text-gray-600 mb-2">
-              Correo electrónico*
-            </label>
-
-            {/* Input centrado */}
-            <input
-              type="email"
-              value={emailSinPass}
-              onChange={(e) => setEmailSinPass(e.target.value)}
-              placeholder="Ingrese su correo electrónico"
-              className="w-full border border-gray-300 rounded-xl p-3.5 text-gray-800 focus:outline-none focus:ring-2 focus:ring-servineo-400 transition mb-6"
-            />
-
-            {/* Botones */}
-            <div className="mt-6 flex justify-end gap-3">
-              {/* Cancelar */}
-              <button
-                onClick={() => setShowModal(false)}
-                className="flex-1 rounded-md bg-[#E5F4FB] px-4 py-2 text-[#1A223F] font-semibold hover:bg-[#2BDDE0]/20"
-              >
-                Cancelar
-              </button>
-
-              {/* Continuar */}
-              <button
-                onClick={() => {}}
-                className="flex-1 rounded-md bg-[#1A223F] px-4 py-2 text-white font-semibold hover:bg-[#2B31E0]"
-              >
-                Continuar
-              </button>
-            </div>
-
-          </div>
-        </div>
-      )}
+      {/* Modal de Authenticator*/}
+      <AuthenticatorSesion
+        showModal={showModal}
+        setShowModal={setShowModal}
+        email={emailSinPass}
+        setEmail={setEmailSinPass}
+      />
 
       {/* Contenedor Toastify */}
       <ToastContainer />
