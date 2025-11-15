@@ -18,9 +18,7 @@ interface VerifyTOTPData {
     name: string;
     picture?: string | null;
   };
-  failedAttempts?: number;
-  twoFactorConfigured?: boolean;
-  twoFactorConfiguredAt?: string;
+  firstTime?: boolean;
 }
 
 export default function AuthenticatorTOTPModal({
@@ -71,21 +69,17 @@ export default function AuthenticatorTOTPModal({
         return;
       }
 
-      const { token, user, failedAttempts, twoFactorConfigured, twoFactorConfiguredAt } = res.data;
+      const { token, user, firstTime } = res.data;
 
-      console.log("[DEBUG] Verificación TOTP exitosa, guardando en localStorage", res.data);
+      // ✅ Guardado idéntico al flujo de Google login
+      if (token) localStorage.setItem("servineo_token", token);
+      if (user) {
+        localStorage.setItem("servineo_user", JSON.stringify(user));
+        sessionStorage.setItem("toastMessage", `¡Bienvenido, ${user.name}!`);
+      }
 
-      // Guardar en localStorage
-      localStorage.setItem('servineo_token', token);
-      localStorage.setItem('servineo_user', JSON.stringify(user));
-      localStorage.setItem('servineo_failed_attempts', String(failedAttempts ?? 0));
-      localStorage.setItem('servineo_twofactor_configured', String(twoFactorConfigured ?? true));
-      localStorage.setItem('servineo_twofactor_configured_at', twoFactorConfiguredAt ?? new Date().toISOString());
-
-      const mensajeExito = `¡Inicio de sesión exitoso! Bienvenido, ${user.name}!`;
-      sessionStorage.setItem("toastMessage", mensajeExito);
-
-      // Redirigir al Home
+      // Cierra modal y redirige a página principal
+      setShowModal();
       window.location.href = "/";
 
     } catch (err: any) {
@@ -103,9 +97,6 @@ export default function AuthenticatorTOTPModal({
     regresarSesionModal();
   };
 
-  const colors = ['text-blue-500', 'text-red-500', 'text-yellow-500', 'text-blue-500', 'text-green-500', 'text-red-500', 'text-yellow-500'];
-  const text = 'Google Authenticator';
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
       <div className="bg-white w-[520px] rounded-lg shadow-lg p-8">
@@ -117,15 +108,6 @@ export default function AuthenticatorTOTPModal({
         </p>
         <p className="block text-sm font-semibold text-gray-600 mb-10">
           Bienvenido {email}!!
-        </p>
-        <p className="block text-sm font-semibold text-gray-600 mb-2 mt-4 text-center">
-          Ingrese el código que muestra en
-        </p>
-        <p className="text-center mb-6 text-2xl font-bold">
-          {text.split('').map((char, idx) => {
-            const colorClass = colors[idx % colors.length];
-            return <span key={idx} className={colorClass}>{char}</span>;
-          })}
         </p>
 
         <form
