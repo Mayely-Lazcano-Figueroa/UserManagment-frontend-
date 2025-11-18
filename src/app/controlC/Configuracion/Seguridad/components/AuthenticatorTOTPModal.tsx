@@ -96,6 +96,9 @@ export default function AuthenticatorTOTPModal({
     setShowModal();
     regresarSesionModal();
   };
+  
+  const colors = ['text-blue-500','text-red-500','text-yellow-500','text-blue-500','text-green-500','text-red-500','text-yellow-500'];
+  const text = 'Google Authenticator';
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
@@ -109,7 +112,16 @@ export default function AuthenticatorTOTPModal({
         <p className="block text-sm font-semibold text-gray-600 mb-10">
           Bienvenido {email}!!
         </p>
-
+        <p className="text-center mb-6 text-2xl font-bold">
+          {text.split('').map((char, idx) => {
+            const colorClass = colors[idx % colors.length];
+            return (
+              <span key={idx} className={colorClass}>
+                {char}
+              </span>
+            );
+          })}
+        </p>
         <form
           onSubmit={handleSubmit}
           className={`bg-white rounded-lg w-[420px] p-6 shadow-lg border mx-auto transition-all duration-300 ${shake ? 'animate-shake border-red-400' : ''}`}
