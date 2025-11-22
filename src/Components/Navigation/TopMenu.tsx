@@ -1,5 +1,6 @@
 "use client";
 
+
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
@@ -40,6 +41,7 @@ export default function TopMenu() {
   }, []);
 
   const navItems = [
+
     { name: "Inicio", href: "/" },
     { name: "Ofertas de trabajo", href: "/job-offer-list" },
     // quitar campos de prueba
@@ -47,6 +49,7 @@ export default function TopMenu() {
     { name: "mis ofertas", href: "/fixer/my-offers" },
     { name: "perfil", href: "/fixer/profile" },
   ];
+
 
   return (
     <>
@@ -78,8 +81,7 @@ export default function TopMenu() {
             </nav>
 
             {/* DERECHA */}
-            <div className="hidden md:flex items-center space-x-4">
-              {!isLogged ? (
+            <div className="hidden md:flex items-center space-x-4">              {!isLogged ? (
                 <>
                   <Link
                     href="../login"
@@ -126,6 +128,7 @@ export default function TopMenu() {
                   )}
                 </div>
               )}
+
             </div>
 
             <div className="md:hidden flex items-center">
@@ -158,6 +161,7 @@ export default function TopMenu() {
             ))}
 
             <div className="pt-4 pb-2 border-t border-gray-200 px-2">
+
               {!isLogged ? (
                 <>
                   <Link
@@ -205,6 +209,7 @@ export default function TopMenu() {
                   </button>
                 </>
               )}
+
             </div>
           </div>
         </div>
