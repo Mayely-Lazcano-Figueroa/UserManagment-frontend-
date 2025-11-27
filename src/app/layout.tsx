@@ -4,7 +4,7 @@ import "./globals.css";
 import { roboto } from './fonts';
 import 'leaflet/dist/leaflet.css'
 import { ReduxProvider } from './redux/ReduxProvider';
-import { AuthProvider } from './lib/hooks/usoAutentificacion'; 
+import { AuthProvider } from './lib/hooks/usoAutentificacion';
 //import TopMenu from '@/Components/Navigation/TopMenu';
 
 const geistSans = Geist({
@@ -30,15 +30,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${roboto.className} `}>
+    <html lang="en" className={roboto.className}>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ReduxProvider>
-          <AuthProvider> 
+          <AuthProvider>
             <div className="">
-              
+
             </div>
             {children}
-          </AuthProvider> 
+          </AuthProvider>
         </ReduxProvider>
       </body>
     </html>
