@@ -15,7 +15,7 @@ interface Dispositivo {
   lastLogin: string;
 }
 
-const API_URL = "http://192.168.1.8:8000";
+//const API_URL = "http://192.168.1.8:8000";<-----borrar al hacer push xav
 
 export default function DispositivosVinculados() {
   const router = useRouter();
