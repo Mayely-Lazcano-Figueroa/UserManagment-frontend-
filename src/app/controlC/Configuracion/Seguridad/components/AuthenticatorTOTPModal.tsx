@@ -96,8 +96,8 @@ export default function AuthenticatorTOTPModal({
     setShowModal();
     regresarSesionModal();
   };
-  
-  const colors = ['text-blue-500','text-red-500','text-yellow-500','text-blue-500','text-green-500','text-red-500','text-yellow-500'];
+
+  const colors = ['text-blue-500', 'text-red-500', 'text-yellow-500', 'text-blue-500', 'text-green-500', 'text-red-500', 'text-yellow-500'];
   const text = 'Google Authenticator';
 
   return (
@@ -132,12 +132,20 @@ export default function AuthenticatorTOTPModal({
           <input
             autoFocus
             inputMode="numeric"
-            pattern="[0-9]*"
+            pattern="\d{6}" // Solo permite exactamente 6 dígitos
+            maxLength={6}   // Limita a 6 caracteres
             value={code}
-            onChange={handleChange}
+            onChange={(e) => {
+              // Eliminar cualquier carácter que no sea número
+              const onlyNumbers = e.target.value.replace(/\D/g, '');
+              // Limitar a 6 caracteres
+              setCode(onlyNumbers.slice(0, 6));
+              setErrorMsg('');
+            }}
             className={`w-full p-2 border rounded mb-2 font-mono text-lg text-center tracking-widest transition-all ${errorMsg ? 'border-red-500 bg-red-50' : 'border-gray-300'}`}
             placeholder="••••••"
           />
+
 
           {errorMsg && <div className="text-red-600 text-sm mb-3 text-center font-medium">{errorMsg}</div>}
 
@@ -159,6 +167,15 @@ export default function AuthenticatorTOTPModal({
             </button>
           </div>
         </form>
+        <p className="text-center text-sm text-gray-600 mt-4">Si no tienes acceso a Google Authenticator</p>
+        <div className="text-center mt-2">
+          <button
+            type="button"
+            className="text-servineo-400 hover:text-servineo-500 font-medium hover:underline transition"
+          >
+            Ingresar con código de recuperación
+          </button>
+        </div>
       </div>
     </div>
   );
