@@ -70,7 +70,7 @@ export default function SignUp() {
               Al registrarte aceptas los{" "}
               <Link
                 href="signUp/registrar/Terminosycondiciones"
-                className="underline text-blue-500 hover:text-blue-400 transition"
+                className="text-blue-500 hover:text-blue-400 font-semibold hover:underline transition"
               >
                 términos de uso
               </Link>
@@ -78,7 +78,7 @@ export default function SignUp() {
             </p>
           </div>
 
-          <p className="mt-6 text-center text-gray-700 text-sm">
+          <p className="mt-2 text-center text-gray-700 text-sm">
             ¿Ya tienes cuenta?{" "}
             <Link
               href="login"
