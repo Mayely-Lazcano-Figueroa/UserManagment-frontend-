@@ -62,7 +62,11 @@ export default function SignUp() {
               onNotify={handleNotify}
                captchaValid={captchaValid}
             />
-            <GithubButton onNotify={handleNotify} />
+            <GithubButton 
+            onNotify={handleNotify}
+             captchaValid={captchaValid}
+            />
+
             <DiscordButton onNotify={handleNotify} />
           </div>
 
