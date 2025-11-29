@@ -10,15 +10,26 @@ interface GithubButtonProps {
     title: string;
     message: string;
   }) => void;
+
+  captchaValid: boolean;  // <-- NUEVA PROP
 }
 
-export default function GithubButton({ onNotify }: GithubButtonProps) {
+export default function GithubButton({ onNotify, captchaValid }: GithubButtonProps) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
   const { setUser } = useAuth();
 
   const handleGithub = () => {
+    if (!captchaValid) {
+      onNotify?.({
+        type: "warning",
+        title: "Completa la verificación",
+        message: "Debes confirmar que no eres un robot antes de continuar.",
+      });
+      return;
+    }
+
     setLoading(true);
 
     const popup = window.open(
@@ -26,6 +37,7 @@ export default function GithubButton({ onNotify }: GithubButtonProps) {
       "GitHubLogin",
       "width=600,height=700"
     );
+
     if (!popup) {
       setLoading(false);
       onNotify?.({
@@ -41,21 +53,18 @@ export default function GithubButton({ onNotify }: GithubButtonProps) {
       const data = event.data;
 
       if (data.type === "GITHUB_AUTH_SUCCESS") {
-        // Mensaje de inicio de sesión
         onNotify?.({
           type: "success",
           title: "Inicio de sesión exitoso",
           message: `Bienvenido ${data.user?.name || ""}`,
         });
 
-        // Guardar token y usuario
         localStorage.setItem("servineo_token", data.token);
         if (data.user) {
           localStorage.setItem("servineo_user", JSON.stringify(data.user));
           setUser(data.user);
         }
 
-        // Mensaje adicional si es primera vez
         if (data.isFirstTime) {
           onNotify?.({
             type: "info",
@@ -68,14 +77,11 @@ export default function GithubButton({ onNotify }: GithubButtonProps) {
         setLoading(false);
         popup.close();
 
-        // Redirección
         setTimeout(() => {
           if (data.isFirstTime) {
             router.push("/signUp/registrar/registroUbicacion");
           } else {
-            setTimeout(() => {
-              window.location.href = "/";
-            }, 2000);
+            setTimeout(() => { window.location.href = "/"; }, 2000);
           }
         }, 2000);
       }
@@ -99,8 +105,11 @@ export default function GithubButton({ onNotify }: GithubButtonProps) {
   return (
     <button
       onClick={handleGithub}
-      disabled={loading}
-      className="flex items-center gap-2 bg-white border border-gray-300 hover:bg-gray-100 font-semibold py-2 px-4 rounded-lg shadow-sm text-black transition-colors"
+      disabled={loading || !captchaValid}
+      className={`flex items-center gap-2 bg-white border border-gray-300 
+        font-semibold py-2 px-4 rounded-lg shadow-sm text-black transition-colors
+        ${!captchaValid ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-100"}
+      `}
     >
       <FaGithub size={24} className="text-black" />
       {loading ? "Cargando..." : "Continuar con GitHub"}
