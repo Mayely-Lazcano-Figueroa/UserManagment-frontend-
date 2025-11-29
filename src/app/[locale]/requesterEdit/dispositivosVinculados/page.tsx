@@ -15,16 +15,16 @@ interface Dispositivo {
   lastLogin: string;
 }
 
-//const API_URL = "http://192.168.1.8:8000";<-----borrar al hacer push xav
-
 export default function DispositivosVinculados() {
   const router = useRouter();
   const { user, logout } = useAuth();
 
   const [dispositivos, setDispositivos] = useState<Dispositivo[]>([]);
   const [loading, setLoading] = useState(true);
-  const [modalVisible, setModalVisible] = useState<string | null>(null); // id del dispositivo a cerrar
+  const [modalVisible, setModalVisible] = useState<string | null>(null);
+  const [modalCerrarTodas, setModalCerrarTodas] = useState(false);
 
+  // Detecta el dispositivo actual
   const detectarDispositivo = () => {
     const parser = new UAParser();
     const result = parser.getResult();
@@ -35,10 +35,11 @@ export default function DispositivosVinculados() {
     return { os, type };
   };
 
+  // Obtener dispositivos del usuario
   const obtenerDispositivos = useCallback(async () => {
     if (!user) return;
     try {
-      const res = await fetch(`http://localhost:8000/devices/${user.id}`);
+      const res = await fetch(`/devices/${user.id}`);
       const data = await res.json();
       setDispositivos(data);
     } catch (err) {
@@ -49,11 +50,12 @@ export default function DispositivosVinculados() {
     }
   }, [user]);
 
+  // Registrar o actualizar el dispositivo actual
   const registrarDispositivo = useCallback(async () => {
     if (!user) return;
     const { os, type } = detectarDispositivo();
     try {
-      const res = await fetch(`http://localhost:8000/devices/register`, {
+      const res = await fetch(`/devices/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId: user.id, os, type }),
@@ -68,9 +70,10 @@ export default function DispositivosVinculados() {
     }
   }, [user, obtenerDispositivos]);
 
+  // Cerrar sesión de un dispositivo
   const cerrarSesionDispositivo = async (_id: string) => {
     try {
-      await fetch(`http://localhost:8000/devices/${_id}`, { method: "DELETE" });
+      await fetch(`/devices/${_id}`, { method: "DELETE" });
       toast.success("Sesión cerrada correctamente ✔");
       setModalVisible(null);
       logout?.();
@@ -81,15 +84,25 @@ export default function DispositivosVinculados() {
     }
   };
 
+  // Cerrar todas las sesiones excepto la actual
   const cerrarTodasSesiones = async () => {
     try {
-      await fetch(`http://localhost:8000/devices/all/${user?.id}`, { method: "DELETE" });
-      toast.success("Todas las sesiones cerradas ✔");
+      const { os, type } = detectarDispositivo();
+      const dispositivoActual = dispositivos.find(d => d.os === os && d.type === type);
+
+      await fetch(`/devices/all/${user?.id}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ except: dispositivoActual?._id }),
+      });
+
+      toast.success("Todas las sesiones cerradas excepto esta ✔");
+      setModalCerrarTodas(false);
       logout?.();
       router.push("/login");
     } catch (err) {
       console.error(err);
-      toast.error("No se pudieron cerrar todas las sesiones.");
+      toast.error("No se pudieron cerrar las sesiones.");
     }
   };
 
@@ -117,15 +130,19 @@ export default function DispositivosVinculados() {
       <h1 className="text-2xl font-semibold mb-4">Dispositivos vinculados</h1>
 
       <button
-        onClick={cerrarTodasSesiones}
+        onClick={() => setModalCerrarTodas(true)}
         className="mb-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
       >
         Cerrar todas las sesiones
       </button>
 
+      {/* Lista de dispositivos */}
       <div className="space-y-4 w-full">
         {dispositivos.map((dispositivo) => (
-          <div key={dispositivo._id} className="flex items-center justify-between p-4 bg-gray-100 rounded-lg shadow">
+          <div
+            key={dispositivo._id}
+            className="flex items-center justify-between p-4 bg-gray-100 rounded-lg shadow"
+          >
             <div className="flex items-center space-x-3">
               {iconoPorTipo(dispositivo.type)}
               <div>
@@ -143,7 +160,7 @@ export default function DispositivosVinculados() {
               Cerrar sesión
             </button>
 
-            {/* Modal */}
+            {/* Modal individual */}
             {modalVisible === dispositivo._id && (
               <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm z-50">
                 <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-80 text-center">
@@ -168,6 +185,31 @@ export default function DispositivosVinculados() {
           </div>
         ))}
       </div>
+
+      {/* Modal cerrar todas las sesiones */}
+      {modalCerrarTodas && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm z-50">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-80 text-center">
+            <p className="mb-4 font-semibold">
+              ¿Seguro que quieres cerrar todas las sesiones excepto esta?
+            </p>
+            <div className="flex justify-around">
+              <button
+                onClick={() => setModalCerrarTodas(false)}
+                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={cerrarTodasSesiones}
+                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+              >
+                Sí, cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
