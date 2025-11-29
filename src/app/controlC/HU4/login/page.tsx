@@ -7,8 +7,11 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '../../HU3/hooks/usoAutentificacion';
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
+// Modales
 import AuthenticatorSesion from '../../Configuracion/Seguridad/components/AuthenticatorSesionModal';
 import AuthenticatorTOTPModal from '../../Configuracion/Seguridad/components/AuthenticatorTOTPModal';
+import CodigoRecuperacionModal from '../../Configuracion/Seguridad/components/AuthenticatorCodigoModal';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -16,8 +19,8 @@ export default function LoginPage() {
   const [mostrarPass, setMostrarPass] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const [modalActivo, setModalActivo] = useState<'ninguno' | 'sesion' | 'totp'>('ninguno');
-  const [emailTOTP, setEmailTOTP] = useState(''); // correo solo para flujo TOTP
+  const [modalActivo, setModalActivo] = useState<'none' | 'sesion' | 'totp' | 'codigo'>('none');
+  const [emailTOTP, setEmailTOTP] = useState('');
 
   const router = useRouter();
   const { setUser } = useAuth();
@@ -35,7 +38,9 @@ export default function LoginPage() {
         localStorage.setItem("servineo_user", JSON.stringify(data.user));
         setUser(data.user);
 
-        const mensajeExito = data.message || `¡Cuenta Creada Exitosamente! Bienvenido, ${data.user.name}!`;
+        const mensajeExito = data.message ||
+          `¡Cuenta creada exitosamente! Bienvenido, ${data.user.name}!`;
+
         sessionStorage.setItem("toastMessage", mensajeExito);
 
         router.push('/');
@@ -45,11 +50,20 @@ export default function LoginPage() {
           res.data?.message ||
           res.error ||
           'Credenciales inválidas o error en el servidor.';
-        toast.error(mensajeError, { position: "top-center", autoClose: 3000, theme: "colored" });
+
+        toast.error(mensajeError, {
+          position: "top-center",
+          autoClose: 3000,
+          theme: "colored"
+        });
       }
 
     } catch (err: any) {
-      toast.error(`Error: ${err?.message ?? 'No se pudo conectar con el servidor.'}`, { position: "top-center", autoClose: 3000, theme: "colored" });
+      toast.error(`Error: ${err?.message ?? 'No se pudo conectar al servidor.'}`, {
+        position: "top-center",
+        autoClose: 3000,
+        theme: "colored"
+      });
     } finally {
       setLoading(false);
     }
@@ -153,7 +167,7 @@ export default function LoginPage() {
       {modalActivo === 'sesion' && (
         <AuthenticatorSesion
           showModal={true}
-          setShowModal={() => setModalActivo('ninguno')}
+          setShowModal={() => setModalActivo('none')}
           emailTOTP={emailTOTP}
           setEmailTOTP={setEmailTOTP}
           abrirTOTP={() => setModalActivo('totp')}
@@ -164,8 +178,19 @@ export default function LoginPage() {
       {modalActivo === 'totp' && (
         <AuthenticatorTOTPModal
           showModal={true}
-          setShowModal={() => setModalActivo('ninguno')}
+          setShowModal={() => setModalActivo('none')}
           regresarSesionModal={() => setModalActivo('sesion')}
+          email={emailTOTP}
+          abrirModalCodigo={() => setModalActivo('codigo')}
+        />
+      )}
+
+      {/* Modal Código de recuperación */}
+      {modalActivo === 'codigo' && (
+        <CodigoRecuperacionModal
+          showModal={true}
+          cerrarModal={() => setModalActivo('none')}
+          volverATOTP={() => setModalActivo('totp')}
           email={emailTOTP}
         />
       )}
