@@ -5,9 +5,11 @@ import RegistroGoogle from "./registrar/registroServicios/registroGoogle";
 import RegistroForm from "./registrar/registroServicios/page";
 import GithubButton from "@/Components/requester/botonRegistro/buttonGithub";
 import DiscordButton from "@/Components/requester/botonRegistro/buttonDiscord";
+import ReCaptchaForm from "@/Components/requester/botonRegistro/recaptcha"
 import NotificationModal from "@/Components/Modal-notifications";
 
 export default function SignUp() {
+  const [captchaValid, setCaptchaValid] = useState(false);
   const [notification, setNotification] = useState({
     isOpen: false,
     type: "info" as "success" | "error" | "info" | "warning",
@@ -48,7 +50,7 @@ export default function SignUp() {
           </p>
 
           <RegistroForm onNotify={handleNotify} />
-
+          <ReCaptchaForm onVerified={(success) => setCaptchaValid(success)} />
           <div className="flex items-center my-6">
             <div className="flex-1 h-px bg-gray-300" />
             <span className="px-3 text-gray-400 text-sm">o continúa con</span>
@@ -56,7 +58,10 @@ export default function SignUp() {
           </div>
 
           <div className="flex flex-col items-center space-y-3 mt-3">
-            <RegistroGoogle onNotify={handleNotify} />
+            <RegistroGoogle 
+              onNotify={handleNotify}
+               captchaValid={captchaValid}
+            />
             <GithubButton onNotify={handleNotify} />
             <DiscordButton onNotify={handleNotify} />
           </div>
