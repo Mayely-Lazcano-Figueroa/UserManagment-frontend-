@@ -13,6 +13,7 @@ interface RegistroFormProps {
     title: string;
     message: string;
   }) => void;
+  captchaValid: boolean;   // <-- NUEVO
 }
 
 const nameRegex = /^[A-Za-záéíóúÁÉÍÓÚñÑ\s]+$/;
@@ -40,7 +41,7 @@ const registroSchema = z
 
 type RegistroSchema = z.infer<typeof registroSchema>;
 
-export default function RegistroForm({ onNotify }: RegistroFormProps) {
+export default function RegistroForm({ onNotify, captchaValid }: RegistroFormProps) {
   const router = useRouter();
   const [formData, setFormData] = useState<RegistroSchema>({
     nombre: "",
@@ -49,6 +50,7 @@ export default function RegistroForm({ onNotify }: RegistroFormProps) {
     password: "",
     confirmarPassword: "",
   });
+
   const [errors, setErrors] = useState<Partial<Record<keyof RegistroSchema, string>>>({});
   const [mostrarPassword, setMostrarPassword] = useState(false);
   const [mostrarConfirmarPassword, setMostrarConfirmarPassword] = useState(false);
@@ -91,6 +93,16 @@ export default function RegistroForm({ onNotify }: RegistroFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // 🛑 VALIDACIÓN DEL CAPTCHA
+    if (!captchaValid) {
+      onNotify?.({
+        type: "warning",
+        title: "Completa la verificación",
+        message: "Debes confirmar que no eres un robot antes de continuar.",
+      });
+      return;
+    }
 
     const validation = registroSchema.safeParse(formData);
 
@@ -137,7 +149,7 @@ export default function RegistroForm({ onNotify }: RegistroFormProps) {
           message: data.message || "No fue posible completar el registro.",
         });
       }
-    }  finally {
+    } finally {
       setCargando(false);
     }
   };
@@ -146,16 +158,11 @@ export default function RegistroForm({ onNotify }: RegistroFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-      {/* Tus inputs y layout se mantienen exactamente igual */}
-      {/* SOLO se añadió la integración de onNotify arriba */}
-      {/* ----------------------------------------------------------------- */}
 
       {/* Nombre y Apellido */}
       <div className="flex gap-3">
         <div className="flex-1">
-          <label className="block text-sm font-semibold text-gray-600 mb-2">
-            Nombre*
-          </label>
+          <label className="block text-sm font-semibold text-gray-600 mb-2">Nombre*</label>
           <input
             name="nombre"
             value={formData.nombre}
@@ -169,9 +176,7 @@ export default function RegistroForm({ onNotify }: RegistroFormProps) {
         </div>
 
         <div className="flex-1">
-          <label className="block text-sm font-semibold text-gray-600 mb-2">
-            Apellido*
-          </label>
+          <label className="block text-sm font-semibold text-gray-600 mb-2">Apellido*</label>
           <input
             name="apellido"
             value={formData.apellido}
@@ -187,9 +192,7 @@ export default function RegistroForm({ onNotify }: RegistroFormProps) {
 
       {/* Correo */}
       <div>
-        <label className="block text-sm font-semibold text-gray-600 mb-2">
-          Correo electrónico*
-        </label>
+        <label className="block text-sm font-semibold text-gray-600 mb-2">Correo electrónico*</label>
         <input
           name="email"
           type="email"
@@ -205,9 +208,7 @@ export default function RegistroForm({ onNotify }: RegistroFormProps) {
 
       {/* Contraseña */}
       <div>
-        <label className="block text-sm font-semibold text-gray-600 mb-2">
-          Contraseña*
-        </label>
+        <label className="block text-sm font-semibold text-gray-600 mb-2">Contraseña*</label>
         <div className="relative">
           <input
             name="password"
@@ -248,9 +249,7 @@ export default function RegistroForm({ onNotify }: RegistroFormProps) {
 
       {/* Confirmar contraseña */}
       <div>
-        <label className="block text-sm font-semibold text-gray-600 mb-2">
-          Confirmar contraseña*
-        </label>
+        <label className="block text-sm font-semibold text-gray-600 mb-2">Confirmar contraseña*</label>
         <div className="relative">
           <input
             name="confirmarPassword"
@@ -270,16 +269,17 @@ export default function RegistroForm({ onNotify }: RegistroFormProps) {
             {mostrarConfirmarPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
         </div>
-        {errors.confirmarPassword && (
-          <p className="text-red-500 text-xs mt-1">{errors.confirmarPassword}</p>
-        )}
+        {errors.confirmarPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmarPassword}</p>}
       </div>
 
       {/* Submit */}
       <button
         type="submit"
-        disabled={cargando}
-        className="w-full flex items-center justify-center gap-2  bg-primary/90 hover:bg-primary text-white font-semibold rounded-xl p-2.5 mt-2 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-60"
+        disabled={cargando || !captchaValid}   // <-- BLOQUEA BOTÓN SI NO HAY CAPTCHA
+        className={`w-full flex items-center justify-center gap-2
+          ${(!captchaValid || cargando) ? "bg-primary/60 cursor-not-allowed" : "bg-primary/90 hover:bg-primary"}
+          text-white font-semibold rounded-xl p-2.5 mt-2 transition-all duration-300
+          shadow-md hover:shadow-lg disabled:opacity-60`}
       >
         {cargando ? (
           <>
