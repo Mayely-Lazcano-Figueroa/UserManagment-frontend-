@@ -1,12 +1,28 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { api, ApiResponse } from '../../../HU4/lib/api';
 
 interface AuthenticatorCodigoModalProps {
   showModal: boolean;
   cerrarModal: () => void;
   volverATOTP: () => void;
   email: string;
+}
+
+interface RecoveryCodeResponse {
+  success: boolean;
+  message: string;
+  data?: {
+    token: string;
+    user: {
+      _id: string;
+      email: string;
+      name: string;
+      picture?: string | null;
+    };
+  };
 }
 
 export default function AuthenticatorCodigoModal({
@@ -17,12 +33,64 @@ export default function AuthenticatorCodigoModal({
 }: AuthenticatorCodigoModalProps) {
 
   const [codigo, setCodigo] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+  const router = useRouter();
 
   if (!showModal) return null;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/[^a-zA-Z0-9]/g, ''); // Solo letras y números
-    setCodigo(value.slice(0, 10)); // Máximo 10 caracteres
+    const value = e.target.value.replace(/[^a-zA-Z0-9]/g, '');
+    setCodigo(value.slice(0, 10));
+    setErrorMsg('');
+  };
+
+  const handleIngresar = async () => {
+    if (!codigo) {
+      setErrorMsg('Ingresa un código de recuperación');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const res: ApiResponse<RecoveryCodeResponse> = await api.post(
+        '/codigos2fa/verify-recovery-code',
+        { email, codigo }
+      );
+
+      const inner = res.data;
+
+      if (!inner?.success) {
+        setErrorMsg(inner?.message || "Código incorrecto");
+        return;
+      }
+
+      const token = inner?.data?.token;
+      const user = inner?.data?.user;
+
+      if (!token || !user) {
+        setErrorMsg("Respuesta inválida del servidor");
+        return;
+      }
+
+      // ✔️ Guardar token y usuario EXACTAMENTE igual al modal TOTP
+      localStorage.setItem('servineo_token', token);
+      localStorage.setItem('servineo_user', JSON.stringify(user));
+
+      // ✔️ Mostrar el mensaje de bienvenida igual que en TOTP
+      sessionStorage.setItem("toastMessage", `¡Bienvenido, ${user.name}!`);
+
+      // Cerrar modal y redirigir
+      cerrarModal();
+      window.location.href = "/";
+      return;
+
+    } catch (err: any) {
+      setErrorMsg('Error en el servidor');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -41,23 +109,31 @@ export default function AuthenticatorCodigoModal({
           Ingresar con código de recuperación
         </p>
 
-        <form className="bg-white rounded-lg w-[420px] p-6 shadow-lg border mx-auto mt-2">
-
+        <form
+          className="bg-white rounded-lg w-[420px] p-6 shadow-lg border mx-auto mt-2"
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleIngresar();
+          }}
+        >
           <p className="text-sm text-gray-600 mb-4 text-center">
-            Ingresa uno de los códigos de recuperación que se te otorgó al momento
-            de configurar inicio de sesión con Authenticator.
+            Ingresa uno de los códigos de recuperacion que se le otorgo al configurar la app de Authenticator.
           </p>
 
           <input
             placeholder="Ingrese un código de recuperación"
             value={codigo}
             onChange={handleChange}
+            className="w-full border rounded-xl p-3.5 text-gray-800 text-center font-mono focus:outline-none focus:ring-2 focus:ring-servineo-400"
             maxLength={10}
-            className="w-full border border-gray-300 rounded-xl p-3.5 text-gray-800
-                       text-center font-mono focus:outline-none focus:ring-2
-                       focus:ring-servineo-400 focus:border-servineo-300 transition"
             required
           />
+
+          {errorMsg && (
+            <p className="text-red-600 text-sm mt-2 text-center font-medium">
+              {errorMsg}
+            </p>
+          )}
 
           <div className="flex gap-4 mt-6">
             <button
@@ -72,13 +148,13 @@ export default function AuthenticatorCodigoModal({
             </button>
 
             <button
-              type="button"
+              type="submit"
+              disabled={loading}
               className="flex-1 rounded-md bg-[#1A223F] px-4 py-2 text-white font-semibold hover:bg-[#2B31E0]"
             >
-              Ingresar
+              {loading ? 'Validando...' : 'Ingresar'}
             </button>
           </div>
-
         </form>
       </div>
     </div>

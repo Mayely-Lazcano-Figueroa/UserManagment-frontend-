@@ -54,11 +54,7 @@ export default function AuthenticatorTOTPModal({
 
     try {
       setLoading(true);
-      console.log("[DEBUG] Enviando POST a /2fa-ingresar/verify-totp con:", { email, code });
-
       const res: ApiResponse<VerifyTOTPData> = await api.post('/2fa-ingresar/verify-totp', { email, code });
-      console.log("[DEBUG] Respuesta del servidor:", res);
-
       if (!res.success) {
         setErrorMsg(res.error || 'Código incorrecto');
         setShake(true);
