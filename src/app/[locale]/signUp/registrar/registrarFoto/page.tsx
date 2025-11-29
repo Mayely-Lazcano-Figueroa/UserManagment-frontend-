@@ -27,14 +27,7 @@ export default function FotoPerfil() {
     setFotoPreview(null);
   };
 
-  const fileToBase64 = (file: File) =>
-    new Promise<string>((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = (error) => reject(error);
-    });
-
+  // ======== SUBIR FOTO COMO ARCHIVO (NO BASE64) =========
   const continuar = async () => {
     if (!archivo) return alert("Primero selecciona una foto");
 
@@ -43,12 +36,15 @@ export default function FotoPerfil() {
 
     try {
       setCargando(true);
-      const fotoBase64 = await fileToBase64(archivo);
+
+      // Enviar archivo por FormData
+      const formData = new FormData();
+      formData.append("foto", archivo);
+      formData.append("usuarioId", usuarioId);
 
       const response = await fetch(`${BASE_URL}/foto-perfil/usuarios/foto`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ usuarioId, fotoPerfil: fotoBase64 }),
+        body: formData, // NO se envía Content-Type
       });
 
       const data = await response.json();
@@ -129,15 +125,8 @@ export default function FotoPerfil() {
           </div>
         </div>
 
-        {/* Botones navegación */}
+        {/* Botón continuar - YA SIN "ATRÁS" */}
         <div className="flex justify-center gap-4 mt-10">
-          <button
-            onClick={() => router.push("/signUp/registrar/registrarServicios")}
-            className="px-5 py-2 bg-red-500 text-white rounded-full hover:opacity-90 transition"
-          >
-            Atrás
-          </button>
-
           <button
             onClick={continuar}
             disabled={!archivo || cargando}
