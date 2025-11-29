@@ -49,7 +49,11 @@ export default function SignUp() {
             Modo requester
           </p>
 
-          <RegistroForm onNotify={handleNotify} />
+          <RegistroForm 
+          onNotify={handleNotify}
+          captchaValid={captchaValid}
+          />
+
           <ReCaptchaForm onVerified={(success) => setCaptchaValid(success)} />
           <div className="flex items-center my-6">
             <div className="flex-1 h-px bg-gray-300" />
