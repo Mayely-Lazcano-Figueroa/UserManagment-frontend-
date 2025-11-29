@@ -279,7 +279,7 @@ export default function RegistroForm({ onNotify }: RegistroFormProps) {
       <button
         type="submit"
         disabled={cargando}
-        className="w-full flex items-center justify-center gap-2 bg-[#4046ee] hover:bg-[#3d43ff] text-white font-semibold rounded-xl p-2.5 mt-2 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-60"
+        className="w-full flex items-center justify-center gap-2  bg-primary/90 hover:bg-primary text-white font-semibold rounded-xl p-2.5 mt-2 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-60"
       >
         {cargando ? (
           <>
