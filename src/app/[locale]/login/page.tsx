@@ -7,14 +7,14 @@ import { api, ApiResponse } from "@/app/redux/services/loginApi";
 import { Eye, EyeOff } from "lucide-react";
 import LoginGoogle from "@/Components/login/google/LoginGoogle";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import NotificationModal from "@/Components/Modal-notifications";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
+// 🆕 Importar el nuevo modal
+import OpcionesLoginModal from "@/Components/login/SeleccionMetodoModal";
 import AuthenticatorSesion from "../requesterEdit/Seguridad/components/AuthenticatorSesionModal";
 import AuthenticatorTOTPModal from "../requesterEdit/Seguridad/components/AuthenticatorTOTPModal";
 import CodigoRecuperacionModal from "../requesterEdit/Seguridad/components/AuthenticatorCodigoModal";
-
 
 /* ----------------------------- Zod schema ----------------------------- */
 const loginSchema = z.object({
@@ -29,9 +29,7 @@ interface LoginFormData {
 }
 
 interface BackendUser {
-  // Ajusta si tu backend usa otras claves; solo usamos 'name' aquí
   name: string;
-  // Opcionales por si los tienes
   id?: string;
   email?: string;
   [key: string]: unknown;
@@ -56,7 +54,8 @@ export default function LoginPage() {
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
 
-  const [modalActivo, setModalActivo] = useState<'none' | 'sesion' | 'totp' | 'codigo'>('none');
+  // 🔧 MODIFICADO: Agregar estado 'opciones'
+  const [modalActivo, setModalActivo] = useState<'none' | 'opciones' | 'sesion' | 'totp' | 'codigo'>('none');
   const [emailTOTP, setEmailTOTP] = useState('');
 
   const [notification, setNotification] = useState<NotificationState>({
@@ -134,7 +133,6 @@ export default function LoginPage() {
 
   return (
     <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}>
-      {/* 🔹 Todo el contenido dentro de un solo elemento raíz */}
       <main className="relative min-h-screen flex items-center justify-center px-6 text-foreground">
         {/* Fondo ultra sutil */}
         <div className="pointer-events-none absolute inset-0 -z-10">
@@ -209,24 +207,15 @@ export default function LoginPage() {
               )}
             </div>
 
-            {/* Enlace auxiliar */}
-            <div className="flex justify-end items-center">
-              <Link
-                href="/login/forgotpass"
-                className="text-primary/90 hover:text-primary underline-offset-2 hover:underline text-sm font-medium"
+            {/* 🆕 UN SOLO BOTÓN que abre el modal de opciones */}
+            <p className="text-center text-sm text-gray-500">
+              <button
+                type="button"
+                onClick={() => setModalActivo('opciones')}
+                className="text-primary/90 hover:text-primary font-medium hover:underline transition"
               >
-                ¿Olvidaste tu contraseña?
-              </Link>
-            </div>
-            
-            <p className="mt-2 text-left text-sm text-gray-500">
-            <button
-              type="button"
-              onClick={() => setModalActivo('sesion')}
-              className="text-servineo-400 hover:text-servineo-500 font-medium hover:underline transition"
-            >
-              Ingresar sin contraseña
-            </button>
+                ¿Necesitas ayuda para ingresar?
+              </button>
             </p>
 
             {/* Botón ingresar */}
@@ -274,37 +263,45 @@ export default function LoginPage() {
           message={notification.message}
         />
 
+        {/* 🆕 MODAL DE OPCIONES */}
+        <OpcionesLoginModal
+          showModal={modalActivo === 'opciones'}
+          onClose={() => setModalActivo('none')}
+          onSelectForgotPassword={() => router.push('/login/forgotpass')}
+          onSelectPasswordless={() => setModalActivo('sesion')}
+        />
+
         {/* Modal Sesión */}
-      {modalActivo === 'sesion' && (
-        <AuthenticatorSesion
-          showModal={true}
-          setShowModal={() => setModalActivo('none')}
-          emailTOTP={emailTOTP}
-          setEmailTOTP={setEmailTOTP}
-          abrirTOTP={() => setModalActivo('totp')}
-        />
-      )}
+        {modalActivo === 'sesion' && (
+          <AuthenticatorSesion
+            showModal={true}
+            setShowModal={() => setModalActivo('none')}
+            emailTOTP={emailTOTP}
+            setEmailTOTP={setEmailTOTP}
+            abrirTOTP={() => setModalActivo('totp')}
+          />
+        )}
 
-      {/* Modal TOTP */}
-      {modalActivo === 'totp' && (
-        <AuthenticatorTOTPModal
-          showModal={true}
-          setShowModal={() => setModalActivo('none')}
-          regresarSesionModal={() => setModalActivo('sesion')}
-          email={emailTOTP}
-          abrirModalCodigo={() => setModalActivo('codigo')}
-        />
-      )}
+        {/* Modal TOTP */}
+        {modalActivo === 'totp' && (
+          <AuthenticatorTOTPModal
+            showModal={true}
+            setShowModal={() => setModalActivo('none')}
+            regresarSesionModal={() => setModalActivo('sesion')}
+            email={emailTOTP}
+            abrirModalCodigo={() => setModalActivo('codigo')}
+          />
+        )}
 
-      {/* Modal Código de recuperación */}
-      {modalActivo === 'codigo' && (
-        <CodigoRecuperacionModal
-          showModal={true}
-          cerrarModal={() => setModalActivo('none')}
-          volverATOTP={() => setModalActivo('totp')}
-          email={emailTOTP}
-        />
-      )}
+        {/* Modal Código de recuperación */}
+        {modalActivo === 'codigo' && (
+          <CodigoRecuperacionModal
+            showModal={true}
+            cerrarModal={() => setModalActivo('none')}
+            volverATOTP={() => setModalActivo('totp')}
+            email={emailTOTP}
+          />
+        )}
 
       </main>
     </GoogleOAuthProvider>
