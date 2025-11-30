@@ -43,9 +43,10 @@ export async function generateQr() {
     });
     console.log('✅ QR generado:', data);
     return data; // { qrDataUrl, issuer }
-  } catch (err: any) {
-    console.error('❌ Error al generar QR:', err.message);
-    throw new Error(err.message || 'Error al generar código QR');
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : 'Error al generar código QR';
+    console.error('❌ Error al generar QR:', errorMessage);
+    throw new Error(errorMessage);
   }
 }
 
@@ -58,9 +59,10 @@ export async function verifyToken(token: string) {
     });
     console.log('✅ Token verificado:', data);
     return data; // { recoveryCodes: [...] }
-  } catch (err: any) {
-    console.error('❌ Error al verificar token:', err.message);
-    throw new Error(err.message || 'Código incorrecto o expirado');
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : 'Código incorrecto o expirado';
+    console.error('❌ Error al verificar token:', errorMessage);
+    throw new Error(errorMessage);
   }
 }
 
@@ -72,8 +74,9 @@ export async function disable2fa() {
     });
     console.log('✅ 2FA deshabilitado:', data);
     return data;
-  } catch (err: any) {
-    console.error('❌ Error al deshabilitar 2FA:', err.message);
-    throw new Error(err.message || 'Error al deshabilitar 2FA');
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : 'Error al deshabilitar 2FA';
+    console.error('❌ Error al deshabilitar 2FA:', errorMessage);
+    throw new Error(errorMessage);
   }
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useRef } from "react";
 import ReCAPTCHA from "react-google-recaptcha";
 
 interface ReCaptchaFormProps {
@@ -8,7 +8,6 @@ interface ReCaptchaFormProps {
 }
 
 const ReCaptchaForm: React.FC<ReCaptchaFormProps> = ({ onVerified }) => {
-  const [token, setToken] = useState<string | null>(null);
   const captchaRef = useRef<ReCAPTCHA>(null);
 
   return (
@@ -17,11 +16,9 @@ const ReCaptchaForm: React.FC<ReCaptchaFormProps> = ({ onVerified }) => {
         ref={captchaRef}
         sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
         onChange={(value) => {
-          setToken(value);
-          onVerified?.(true); // Habilita botones inmediatamente
+          onVerified?.(!!value); // Habilita botones si hay valor
         }}
         onExpired={() => {
-          setToken(null);
           onVerified?.(false); // Deshabilita todo al expirar
           captchaRef.current?.reset(); // Limpia el captcha visual
         }}

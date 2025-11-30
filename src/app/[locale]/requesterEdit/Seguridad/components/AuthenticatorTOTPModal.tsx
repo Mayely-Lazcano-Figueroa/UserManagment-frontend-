@@ -7,7 +7,7 @@ interface AuthenticatorTOTPModalProps {
   showModal: boolean;
   setShowModal: () => void;
   regresarSesionModal: () => void;
-  abrirModalCodigo: () => void;   // <-- Nueva función para abrir el modal de código de recuperación
+  abrirModalCodigo: () => void;
   email: string;
 }
 
@@ -78,8 +78,10 @@ export default function AuthenticatorTOTPModal({
       setShowModal();
       window.location.href = "/";
 
-    } catch (err: any) {
-      setErrorMsg(err.message || 'Error de servidor');
+    } catch (err) {
+      console.error('Error al verificar TOTP:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Error de servidor';
+      setErrorMsg(errorMessage);
       setShake(true);
       setTimeout(() => setShake(false), 500);
     } finally {
@@ -174,7 +176,7 @@ export default function AuthenticatorTOTPModal({
         <div className="text-center mt-2">
           <button
             type="button"
-            onClick={abrirModalCodigo}     // <-- Aquí abre el nuevo modal
+            onClick={abrirModalCodigo}
             className="text-servineo-400 hover:text-servineo-500 font-medium hover:underline transition"
           >
             Ingresar con código de recuperación

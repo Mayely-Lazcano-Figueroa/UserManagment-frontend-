@@ -49,9 +49,10 @@ export default function AuthenticatorPage() {
     try {
       const data = await generateQr();
       setQrDataUrl(data.qrDataUrl ?? null);
-    } catch (err: any) {
+    } catch (err) {
       console.error('Error al generar QR', err);
-      alert(err?.response?.data?.message || 'Error generando QR. Reintenta.');
+      const errorMessage = err instanceof Error ? err.message : 'Error generando QR. Reintenta.';
+      alert(errorMessage);
       setQrOpen(false);
     } finally {
       setLoading(false);
@@ -92,22 +93,23 @@ const handleVerify = async (token: string) => {
 
   // Handler para desactivar 2FA (lamada a backend + UI)
  const handleDisableConfirm = async () => {
-  setDisableLoading(true);
-  try {
-    await disable2fa();
-    localStorage.removeItem('servineo_twofactor_configured');
-    localStorage.removeItem('servineo_twofactor_configured_at');
-    setConfigured(false);
-    setConfiguredAt(null);
-    setRecoveryCodes(null);
-    // ✅ no cerramos el modal aquí, dejamos que el modal cambie a "done"
-  } catch (err: any) {
-    console.error('Error desactivando 2FA', err);
-    alert(err?.response?.data?.message || 'Error al desactivar 2FA');
-  } finally {
-    setDisableLoading(false);
-  }
-};
+    setDisableLoading(true);
+    try {
+      await disable2fa();
+      localStorage.removeItem('servineo_twofactor_configured');
+      localStorage.removeItem('servineo_twofactor_configured_at');
+      setConfigured(false);
+      setConfiguredAt(null);
+      setRecoveryCodes(null);
+      // ✅ no cerramos el modal aquí, dejamos que el modal cambie a "done"
+    } catch (err) {
+      console.error('Error desactivando 2FA', err);
+      const errorMessage = err instanceof Error ? err.message : 'Error al desactivar 2FA';
+      alert(errorMessage);
+    } finally {
+      setDisableLoading(false);
+    }
+  };
 
 
   return (

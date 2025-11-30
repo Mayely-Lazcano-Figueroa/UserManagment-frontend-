@@ -1,7 +1,6 @@
 'use client';
 import { useState } from 'react';
 import { api } from '../../../../redux/services/api';
-import AuthenticatorTOTPModal from './AuthenticatorTOTPModal';
 
 interface AuthenticatorSesionProps {
   showModal: boolean;

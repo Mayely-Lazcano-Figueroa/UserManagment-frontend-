@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import Image from 'next/image';
 
 export default function SeguridadPage() {
   const router = useRouter();
@@ -21,10 +21,12 @@ export default function SeguridadPage() {
           className="flex items-center gap-3 px-6 py-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ease-out bg-white text-gray-800 cursor-pointer min-w-[220px]"
         >
           <div className="p-2 rounded-md bg-blue-50">
-            <img
+            <Image
               src="/icons/edit-pass.png"
               alt="Cambiar contraseña"
-              className="w-8 h-8 object-contain text-blue-600"
+              width={32}
+              height={32}
+              className="w-8 h-8 object-contain"
             />
           </div>
           <span className="font-medium">Cambiar contraseña</span>
@@ -38,10 +40,12 @@ export default function SeguridadPage() {
           className="flex items-center gap-3 px-6 py-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ease-out bg-white text-gray-800 cursor-pointer min-w-[220px]"
         >
           <div className="p-2 rounded-md bg-blue-50">
-            <img
+            <Image
               src="/icons/logins.png"
               alt="Dispositivos vinculados"
-              className="w-6 h-6 object-contain text-blue-600"
+              width={24}
+              height={24}
+              className="w-6 h-6 object-contain"
             />
           </div>
           <span className="font-medium">Inicios de sesión</span>
@@ -49,16 +53,18 @@ export default function SeguridadPage() {
 
         {/* 🆕 Card 3: Authenticator */}
         <button
-          onClick={() =>
-           
-          }
+          onClick={() => {
+            router.push('/requesterEdit/Seguridad/Authenticator');
+          }}
           className="flex items-center gap-3 px-6 py-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ease-out bg-white text-gray-800 cursor-pointer min-w-[220px]"
         >
           <div className="p-2 rounded-md bg-blue-50">
-            <img
+            <Image
               src="/icons/appauth.png"
               alt="Authenticator"
-              className="w-6 h-6 object-contain text-blue-600"
+              width={24}
+              height={24}
+              className="w-6 h-6 object-contain"
             />
           </div>
           <span className="font-medium">Authenticator</span>

@@ -8,7 +8,7 @@ interface Props {
   onConfirm: () => void;      // cuando el usuario confirma que guardó los códigos
 }
 
-export default function RecoveryModal({ open, codes, onClose, onConfirm }: Props) {
+export default function RecoveryModal({ open, codes, onConfirm }: Props) {
   if (!open) return null;
 
   const handleCopyAll = async () => {

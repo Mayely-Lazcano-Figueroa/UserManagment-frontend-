@@ -43,9 +43,9 @@ export default function VerifyTokenModal({ open, onClose, onVerify, loading }: P
     }
 
     try {
-      await onVerify(code.trim()); // si verifyToken lanza, caemos al catch de abajo
-    } catch (err: any) {
-      const msg = err?.message || 'Código incorrecto o expirado. Intenta nuevamente.';
+      await onVerify(code.trim());
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Código incorrecto o expirado. Intenta nuevamente.';
       setErrorMsg(msg);
       setShake(true);
       setTimeout(() => setShake(false), 400);

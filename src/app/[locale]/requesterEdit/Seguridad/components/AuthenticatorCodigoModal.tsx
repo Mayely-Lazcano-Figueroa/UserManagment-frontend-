@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { api, ApiResponse } from '../../../../redux/services/api';
 
 interface AuthenticatorCodigoModalProps {
@@ -35,7 +34,6 @@ export default function AuthenticatorCodigoModal({
   const [codigo, setCodigo] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
-  const router = useRouter();
 
   if (!showModal) return null;
 
@@ -86,8 +84,10 @@ export default function AuthenticatorCodigoModal({
       window.location.href = "/";
       return;
 
-    } catch (err: any) {
-      setErrorMsg('Error en el servidor');
+    } catch (err) {
+      console.error('Error al verificar código de recuperación:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Error en el servidor';
+      setErrorMsg(errorMessage);
     } finally {
       setLoading(false);
     }
