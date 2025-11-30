@@ -274,15 +274,13 @@ export default function RegistroForm({ onNotify, captchaValid }: RegistroFormPro
 
       {/* Submit */}
       <button
-      type="submit"
-      disabled={cargando}   // <-- SOLO se desactiva cuando está cargando
-      className={`w-full flex items-center justify-center gap-2
-      ${!captchaValid ? "bg-primary/60 cursor-not-allowed" : "bg-primary/90 hover:bg-primary"}
-      ${cargando ? "opacity-60 cursor-not-allowed" : ""}
-      text-white font-semibold rounded-xl p-2.5 mt-2 transition-all duration-300
-      shadow-md hover:shadow-lg`}
+        type="submit"
+        disabled={cargando || !captchaValid}   // <-- BLOQUEA BOTÓN SI NO HAY CAPTCHA
+        className={`w-full flex items-center justify-center gap-2
+          ${(!captchaValid || cargando) ? "bg-primary/60 cursor-not-allowed" : "bg-primary/90 hover:bg-primary"}
+          text-white font-semibold rounded-xl p-2.5 mt-2 transition-all duration-300
+          shadow-md hover:shadow-lg disabled:opacity-60`}
       >
-
         {cargando ? (
           <>
             <Loader2 className="animate-spin w-5 h-5" />
