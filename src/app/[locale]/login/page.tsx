@@ -11,6 +11,11 @@ import Link from "next/link";
 import NotificationModal from "@/Components/Modal-notifications";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
+import AuthenticatorSesion from "../requesterEdit/Seguridad/components/AuthenticatorSesionModal";
+import AuthenticatorTOTPModal from "../requesterEdit/Seguridad/components/AuthenticatorTOTPModal";
+import CodigoRecuperacionModal from "../requesterEdit/Seguridad/components/AuthenticatorCodigoModal";
+
+
 /* ----------------------------- Zod schema ----------------------------- */
 const loginSchema = z.object({
   email: z.string().email("Debe ingresar un correo válido"),
@@ -50,6 +55,9 @@ export default function LoginPage() {
   const [mostrarPass, setMostrarPass] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
+
+  const [modalActivo, setModalActivo] = useState<'none' | 'sesion' | 'totp' | 'codigo'>('none');
+  const [emailTOTP, setEmailTOTP] = useState('');
 
   const [notification, setNotification] = useState<NotificationState>({
     isOpen: false,
@@ -210,6 +218,16 @@ export default function LoginPage() {
                 ¿Olvidaste tu contraseña?
               </Link>
             </div>
+            
+            <p className="mt-2 text-left text-sm text-gray-500">
+            <button
+              type="button"
+              onClick={() => setModalActivo('sesion')}
+              className="text-servineo-400 hover:text-servineo-500 font-medium hover:underline transition"
+            >
+              Ingresar sin contraseña
+            </button>
+            </p>
 
             {/* Botón ingresar */}
             <button
@@ -255,6 +273,39 @@ export default function LoginPage() {
           title={notification.title}
           message={notification.message}
         />
+
+        {/* Modal Sesión */}
+      {modalActivo === 'sesion' && (
+        <AuthenticatorSesion
+          showModal={true}
+          setShowModal={() => setModalActivo('none')}
+          emailTOTP={emailTOTP}
+          setEmailTOTP={setEmailTOTP}
+          abrirTOTP={() => setModalActivo('totp')}
+        />
+      )}
+
+      {/* Modal TOTP */}
+      {modalActivo === 'totp' && (
+        <AuthenticatorTOTPModal
+          showModal={true}
+          setShowModal={() => setModalActivo('none')}
+          regresarSesionModal={() => setModalActivo('sesion')}
+          email={emailTOTP}
+          abrirModalCodigo={() => setModalActivo('codigo')}
+        />
+      )}
+
+      {/* Modal Código de recuperación */}
+      {modalActivo === 'codigo' && (
+        <CodigoRecuperacionModal
+          showModal={true}
+          cerrarModal={() => setModalActivo('none')}
+          volverATOTP={() => setModalActivo('totp')}
+          email={emailTOTP}
+        />
+      )}
+
       </main>
     </GoogleOAuthProvider>
   );
