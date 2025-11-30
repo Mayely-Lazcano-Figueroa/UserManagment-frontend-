@@ -13,15 +13,23 @@ export default function VerifyTokenModal({ open, onClose, onVerify, loading }: P
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [shake, setShake] = useState(false);
 
+  // NUEVO: intentos restantes y mensaje de bloqueo
+  const [attemptsLeft, setAttemptsLeft] = useState<number | null>(null);
+  const [lockedInfo, setLockedInfo] = useState<string | null>(null);
+
   useEffect(() => {
     if (open) {
       setCode('');
       setErrorMsg(null);
       setShake(false);
+      setAttemptsLeft(null);
+      setLockedInfo(null);
     } else {
       setCode('');
       setErrorMsg(null);
       setShake(false);
+      setAttemptsLeft(null);
+      setLockedInfo(null);
     }
   }, [open]);
 
@@ -31,6 +39,8 @@ export default function VerifyTokenModal({ open, onClose, onVerify, loading }: P
     const onlyDigits = e.target.value.replace(/\D/g, '');
     setCode(onlyDigits.slice(0, 6));
     if (errorMsg) setErrorMsg(null);
+    if (attemptsLeft !== null) setAttemptsLeft(null);
+    if (lockedInfo) setLockedInfo(null);
   };
 
   const handleSubmit = async (e?: React.FormEvent) => {
@@ -43,9 +53,42 @@ export default function VerifyTokenModal({ open, onClose, onVerify, loading }: P
     }
 
     try {
-      await onVerify(code.trim()); // si verifyToken lanza, caemos al catch de abajo
+      // onVerify será quien llame al backend (verifyToken) y,
+      // en caso de error, lanzará la excepción que atrapamos aquí.
+      await onVerify(code.trim());
     } catch (err: any) {
-      const msg = err?.message || 'Código incorrecto o expirado. Intenta nuevamente.';
+      // Limpio estados anteriores
+      setAttemptsLeft(null);
+      setLockedInfo(null);
+
+      let msg = 'Código incorrecto o expirado. Intenta nuevamente.';
+
+      const status = err?.response?.status;
+      const data = err?.response?.data;
+
+      if (status === 423) {
+        // bloqueado por demasiados intentos
+        const minutes =
+          data?.retryAfterSeconds != null
+            ? Math.ceil(data.retryAfterSeconds / 60)
+            : null;
+
+        msg =
+          data?.message ||
+          `Tu cuenta está temporalmente bloqueada por demasiados intentos.`;
+        setLockedInfo(
+          minutes
+            ? `Podrás volver a intentar en aproximadamente ${minutes} minuto(s).`
+            : null
+        );
+      } else if (status === 400 && typeof data?.attemptsLeft === 'number') {
+        // token inválido pero todavía no bloqueado: mostrar intentos restantes
+        msg = data?.message || 'Token inválido.';
+        setAttemptsLeft(data.attemptsLeft);
+      } else if (err?.message) {
+        msg = err.message;
+      }
+
       setErrorMsg(msg);
       setShake(true);
       setTimeout(() => setShake(false), 400);
@@ -60,8 +103,12 @@ export default function VerifyTokenModal({ open, onClose, onVerify, loading }: P
           shake ? 'animate-shake border-red-400' : ''
         }`}
       >
-        <h3 className="text-lg font-semibold mb-2">Ingresa el código de autenticador</h3>
-        <p className="text-sm text-gray-600 mb-4">Introduce los 6 dígitos que muestra tu app de autenticación.</p>
+        <h3 className="text-lg font-semibold mb-2">
+          Ingresa el código de autenticador
+        </h3>
+        <p className="text-sm text-gray-600 mb-4">
+          Introduce los 6 dígitos que muestra tu app de autenticación.
+        </p>
 
         <input
           autoFocus
@@ -75,7 +122,25 @@ export default function VerifyTokenModal({ open, onClose, onVerify, loading }: P
           placeholder="••••••"
         />
 
-        {errorMsg && <div className="text-red-600 text-sm mb-3 text-center font-medium">{errorMsg}</div>}
+        {errorMsg && (
+          <div className="text-red-600 text-sm mb-1 text-center font-medium">
+            {errorMsg}
+          </div>
+        )}
+
+        {/* NUEVO: intentos restantes */}
+        {attemptsLeft !== null && attemptsLeft >= 0 && (
+          <div className="text-xs text-center text-red-500 mb-1">
+            Intentos restantes: <span className="font-semibold">{attemptsLeft}</span>
+          </div>
+        )}
+
+        {/* NUEVO: info de bloqueo */}
+        {lockedInfo && (
+          <div className="text-xs text-center text-red-500 mb-2">
+            {lockedInfo}
+          </div>
+        )}
 
         <div className="flex justify-end gap-3 mt-2">
           <button
@@ -83,6 +148,8 @@ export default function VerifyTokenModal({ open, onClose, onVerify, loading }: P
             onClick={() => {
               setCode('');
               setErrorMsg(null);
+              setAttemptsLeft(null);
+              setLockedInfo(null);
               onClose();
             }}
             className="px-3 py-2 rounded border text-sm bg-white text-gray-700"
@@ -90,7 +157,11 @@ export default function VerifyTokenModal({ open, onClose, onVerify, loading }: P
           >
             Cancelar
           </button>
-          <button type="submit" className="px-4 py-2 rounded text-sm bg-indigo-600 text-white" disabled={loading}>
+          <button
+            type="submit"
+            className="px-4 py-2 rounded text-sm bg-indigo-600 text-white"
+            disabled={loading}
+          >
             {loading ? 'Verificando...' : 'Verificar'}
           </button>
         </div>
@@ -98,12 +169,23 @@ export default function VerifyTokenModal({ open, onClose, onVerify, loading }: P
 
       <style jsx>{`
         @keyframes shake {
-          0%, 100% { transform: translateX(0); }
-          25% { transform: translateX(-5px); }
-          50% { transform: translateX(5px); }
-          75% { transform: translateX(-4px); }
+          0%,
+          100% {
+            transform: translateX(0);
+          }
+          25% {
+            transform: translateX(-5px);
+          }
+          50% {
+            transform: translateX(5px);
+          }
+          75% {
+            transform: translateX(-4px);
+          }
         }
-        .animate-shake { animation: shake 0.4s ease-in-out; }
+        .animate-shake {
+          animation: shake 0.4s ease-in-out;
+        }
       `}</style>
     </div>
   );
