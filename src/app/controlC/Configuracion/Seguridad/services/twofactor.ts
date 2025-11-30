@@ -28,13 +28,8 @@ export async function generateQr() {
 
 // src/app/controlC/Configuracion/Seguridad/services/twofactor.ts
 export async function verifyToken(token: string) {
-  try {
-    const res = await client.post('/verify', { token });
-    return res.data; // { recoveryCodes: [...] }
-  } catch (err: any) {
-    const msg = err?.response?.data?.message || 'Código incorrecto o expirado';
-    throw new Error(msg);
-  }
+  const res = await client.post('/verify', { token });
+  return res.data; // { recoveryCodes: [...] }
 }
 
 
