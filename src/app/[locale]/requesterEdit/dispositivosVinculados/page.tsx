@@ -12,6 +12,7 @@ interface Dispositivo {
   userId: string;
   os: string;
   type: string;
+  userAgent: string;
   lastLogin: string;
 }
 
@@ -20,6 +21,7 @@ export default function DispositivosVinculados() {
   const { user, logout, loading } = useAuth();
 
   const [dispositivos, setDispositivos] = useState<Dispositivo[]>([]);
+  const [cargandoDispositivos, setCargandoDispositivos] = useState(true);
   const [modalVisible, setModalVisible] = useState<string | null>(null);
   const [modalCerrarTodas, setModalCerrarTodas] = useState(false);
 
@@ -38,6 +40,7 @@ export default function DispositivosVinculados() {
   const obtenerDispositivos = useCallback(async () => {
     if (!user) return;
     try {
+      setCargandoDispositivos(true);
       const res = await fetch(`${API_URL}/devices/${user.id}`);
       if (!res.ok) throw new Error("Error en la respuesta del backend");
       const data = await res.json();
@@ -45,6 +48,8 @@ export default function DispositivosVinculados() {
     } catch (err) {
       console.error(err);
       toast.error("No se pudieron cargar los dispositivos.");
+    } finally {
+      setCargandoDispositivos(false);
     }
   }, [user, API_URL]);
 
@@ -55,25 +60,36 @@ export default function DispositivosVinculados() {
       const res = await fetch(`${API_URL}/devices/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: user.id, os, type }),
+        body: JSON.stringify({ 
+          userId: user.id, 
+          os, 
+          type, 
+          userAgent: navigator.userAgent 
+        }),
       });
       const data = await res.json();
       if (!res.ok) return toast.error(data.message || "Error al registrar dispositivo");
-      toast.success("Dispositivo vinculado/actualizado ✔");
       obtenerDispositivos();
     } catch (err) {
       console.error(err);
       toast.error("Error al registrar dispositivo");
     }
-  }, [user, obtenerDispositivos, API_URL]);
+  }, [user, API_URL, obtenerDispositivos]);
 
   const cerrarSesionDispositivo = async (_id: string) => {
     try {
       await fetch(`${API_URL}/devices/${_id}`, { method: "DELETE" });
       toast.success("Sesión cerrada correctamente ✔");
       setModalVisible(null);
-      logout?.();
-      router.push("/login");
+      
+      // Solo hacer logout si es el dispositivo actual
+      const dispositivoActual = dispositivos.find(d => d.userAgent === navigator.userAgent);
+      if (dispositivoActual?._id === _id) {
+        logout?.();
+        router.push("/login");
+      } else {
+        obtenerDispositivos();
+      }
     } catch (err) {
       console.error(err);
       toast.error("No se pudo cerrar la sesión.");
@@ -82,19 +98,23 @@ export default function DispositivosVinculados() {
 
   const cerrarTodasSesiones = async () => {
     try {
-      const { os, type } = detectarDispositivo();
-      const dispositivoActual = dispositivos.find(d => d.os === os && d.type === type);
+      const userAgent = navigator.userAgent;
+      const dispositivoActual = dispositivos.find(d => d.userAgent === userAgent);
+
+      if (!dispositivoActual) {
+        toast.error("No se pudo identificar el dispositivo actual");
+        return;
+      }
 
       await fetch(`${API_URL}/devices/all/${user?.id}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ except: dispositivoActual?._id }),
+        body: JSON.stringify({ except: dispositivoActual._id }),
       });
 
       toast.success("Todas las sesiones cerradas excepto esta ✔");
       setModalCerrarTodas(false);
-      logout?.();
-      router.push("/login");
+      obtenerDispositivos();
     } catch (err) {
       console.error(err);
       toast.error("No se pudieron cerrar las sesiones.");
@@ -102,8 +122,11 @@ export default function DispositivosVinculados() {
   };
 
   useEffect(() => {
-    if (user) registrarDispositivo();
-  }, [user, registrarDispositivo]);
+    if (user) {
+      registrarDispositivo();
+      obtenerDispositivos();
+    }
+  }, [user]); // Solo depende de user
 
   if (loading) return <p className="text-center mt-10">Cargando usuario...</p>;
   if (!user) return <p className="text-center mt-10">No hay usuario autenticado</p>;
@@ -130,11 +153,14 @@ export default function DispositivosVinculados() {
       <button
         onClick={() => setModalCerrarTodas(true)}
         className="mb-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+        disabled={dispositivos.length <= 1}
       >
         Cerrar todas las sesiones
       </button>
 
-      {dispositivos.length === 0 ? (
+      {cargandoDispositivos ? (
+        <p className="text-center text-gray-500">Cargando dispositivos...</p>
+      ) : dispositivos.length === 0 ? (
         <p className="text-center text-gray-500">No hay dispositivos vinculados</p>
       ) : (
         <div className="space-y-4 w-full">
