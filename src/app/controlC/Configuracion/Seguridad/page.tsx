@@ -30,7 +30,7 @@ export default function SeguridadPage() {
           <span className="font-medium">Cambiar contraseña</span>
         </button>
 
-        {/* Card 2: Dispositivos vinculados */}
+        {/* card 2: dispositivos vinculados */}
         <button
           onClick={() =>
             router.push('/controlC/Configuracion/Seguridad/Inicios')
