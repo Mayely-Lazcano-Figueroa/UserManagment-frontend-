@@ -71,7 +71,11 @@ export default function SignUp() {
              captchaValid={captchaValid}
             />
 
-            <DiscordButton onNotify={handleNotify} />
+            <DiscordButton 
+            onNotify={handleNotify}
+            captchaValid={captchaValid}
+            />
+
           </div>
           <div className="mt-5">
           <ReCaptchaForm onVerified={(success) => setCaptchaValid(success)} />
