@@ -54,7 +54,7 @@ export default function SignUp() {
           captchaValid={captchaValid}
           />
 
-          <ReCaptchaForm onVerified={(success) => setCaptchaValid(success)} />
+          
           <div className="flex items-center my-6">
             <div className="flex-1 h-px bg-gray-300" />
             <span className="px-3 text-gray-400 text-sm">o continúa con</span>
@@ -72,6 +72,9 @@ export default function SignUp() {
             />
 
             <DiscordButton onNotify={handleNotify} />
+          </div>
+          <div className="mt-5">
+          <ReCaptchaForm onVerified={(success) => setCaptchaValid(success)} />
           </div>
 
           <div className="flex items-start mt-5 text-sm text-gray-600">
