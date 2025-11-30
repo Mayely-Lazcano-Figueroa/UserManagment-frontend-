@@ -194,6 +194,24 @@ export default function ConfiguracionPage() {
                 </div>
                 <span className="font-medium">Dispositivos vinculados</span>
               </button>
+
+              {/* 🆕 Authenticator (nuevo botón) */}
+        <button
+          onClick={() =>  router.push('/requesterEdit/Seguridad/Authenticator/')}
+          className="flex items-center gap-3 px-6 py-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ease-out bg-white text-gray-800 cursor-pointer min-w-[220px]"
+        >
+          <div className="p-2 rounded-md bg-blue-50">
+            <Image 
+              src="/icons/appauth.png" 
+              alt="Authenticator" 
+              width={24}
+              height={24}
+              className="w-6 h-6 object-contain text-blue-600" 
+            />
+          </div>
+          <span className="font-medium">Authenticator</span>
+        </button>
+
             </div>
           </div>
         );
