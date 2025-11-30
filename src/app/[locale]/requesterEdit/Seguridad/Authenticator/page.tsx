@@ -4,13 +4,13 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 // Componentes modales
-import AuthenticatorQrModal from '../components/AuthenticatorQrModal';
-import VerifyTokenModal from '../components/VerifyTokenModal';
-import RecoveryModal from '../components/RecoveryModal';
-import ConfirmDisableModal from '../components/ConfirmDisableModal';
+import AuthenticatorQrModal from '../../../../../Components/requester/Authenticator/AuthenticatorQrModal';
+import VerifyTokenModal from '../../../../../Components/requester/Authenticator/VerifyTokenModal';
+import RecoveryModal from '../../../../../Components/requester/Authenticator/RecoveryModal';
+import ConfirmDisableModal from '../../../../../Components/requester/Authenticator/ConfirmDisableModal';
 
 // Servicio 2FA (asegúrate que exporta generateQr, verifyToken, disable2fa)
-import { generateQr, verifyToken, disable2fa } from '../services/twofactor';
+import { generateQr, verifyToken, disable2fa } from '../../../../redux/services/twofactor';
 
 export default function AuthenticatorPage() {
   const router = useRouter();

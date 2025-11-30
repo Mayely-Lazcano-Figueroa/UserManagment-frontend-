@@ -12,9 +12,9 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 
 // 🆕 Importar el nuevo modal
 import OpcionesLoginModal from "@/Components/login/SeleccionMetodoModal";
-import AuthenticatorSesion from "../requesterEdit/Seguridad/components/AuthenticatorSesionModal";
-import AuthenticatorTOTPModal from "../requesterEdit/Seguridad/components/AuthenticatorTOTPModal";
-import CodigoRecuperacionModal from "../requesterEdit/Seguridad/components/AuthenticatorCodigoModal";
+import AuthenticatorSesion from "../../../Components/requester/Authenticator/AuthenticatorSesionModal";
+import AuthenticatorTOTPModal from "../../../Components/requester/Authenticator/AuthenticatorTOTPModal";
+import CodigoRecuperacionModal from "../../../Components/requester/Authenticator/AuthenticatorCodigoModal";
 
 /* ----------------------------- Zod schema ----------------------------- */
 const loginSchema = z.object({

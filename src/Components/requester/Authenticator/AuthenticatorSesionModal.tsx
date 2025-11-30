@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { api } from '../../../../redux/services/api';
+import { api } from '../../../app/redux/services/api';
 
 interface AuthenticatorSesionProps {
   showModal: boolean;
