@@ -9,6 +9,7 @@ import { ReactNode } from 'react';
 import { notFound } from 'next/navigation';
 import { NextIntlClientProvider } from 'next-intl';
 import { TranslationButton } from '@/Components/Shared/TranslationButton';
+import { AuthProvider } from '@/Components/requester/auth/usoAutentificacion';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -59,7 +60,7 @@ export default async function RootLayout({ children, params }: Props) {
 
   const messages = await loader();
 
-  return (
+   return (
     <html lang={locale} className={`${roboto.className}`}>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
@@ -67,16 +68,19 @@ export default async function RootLayout({ children, params }: Props) {
       >
         <NextIntlClientProvider locale={locale} messages={messages}>
           <ReduxProvider>
-            <div className="text-black fixed bottom-7 right-7 z-[9999]">
-              <TranslationButton />
-            </div>
-            <div className="">
-              <TopMenu />
-            </div>
-            {children}
+            <AuthProvider> {/* ← AGREGAR AuthProvider */}
+              <div className="text-black fixed bottom-7 right-7 z-[9999]">
+                <TranslationButton />
+              </div>
+              <div className="">
+                <TopMenu />
+              </div>
+              {children}
+            </AuthProvider> {/* ← CERRAR AuthProvider */}
           </ReduxProvider>
         </NextIntlClientProvider>
       </body>
     </html>
   );
 }
+  

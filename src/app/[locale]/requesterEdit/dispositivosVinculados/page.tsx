@@ -53,28 +53,36 @@ export default function DispositivosVinculados() {
     }
   }, [user, API_URL]);
 
-  const registrarDispositivo = useCallback(async () => {
-    if (!user) return;
-    const { os, type } = detectarDispositivo();
-    try {
-      const res = await fetch(`${API_URL}/devices/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          userId: user.id, 
-          os, 
-          type, 
-          userAgent: navigator.userAgent 
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) return toast.error(data.message || "Error al registrar dispositivo");
-      obtenerDispositivos();
-    } catch (err) {
-      console.error(err);
-      toast.error("Error al registrar dispositivo");
-    }
-  }, [user, API_URL, obtenerDispositivos]);
+const registrarDispositivo = useCallback(async () => {
+  if (!user) return;
+  const { os, type } = detectarDispositivo();
+  
+  console.log("Registrando dispositivo:", { 
+    userId: user.id, 
+    userAgent: navigator.userAgent 
+  });
+  
+  try {
+    const res = await fetch(`${API_URL}/devices/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+        userId: user.id, 
+        os, 
+        type, 
+        userAgent: navigator.userAgent 
+      }),
+    });
+    const data = await res.json();
+    console.log("Respuesta del backend:", data);
+    
+    if (!res.ok) return toast.error(data.message || "Error al registrar dispositivo");
+    obtenerDispositivos();
+  } catch (err) {
+    console.error(err);
+    toast.error("Error al registrar dispositivo");
+  }
+}, [user, API_URL, obtenerDispositivos]);
 
   const cerrarSesionDispositivo = async (_id: string) => {
     try {
