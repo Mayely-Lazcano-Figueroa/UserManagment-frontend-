@@ -11,7 +11,7 @@ interface GithubButtonProps {
     message: string;
   }) => void;
 
-  captchaValid: boolean;  // <-- NUEVA PROP
+  captchaValid: boolean;
 }
 
 export default function GithubButton({ onNotify, captchaValid }: GithubButtonProps) {
@@ -25,7 +25,7 @@ export default function GithubButton({ onNotify, captchaValid }: GithubButtonPro
       onNotify?.({
         type: "warning",
         title: "Completa la verificación",
-        message: "Debes confirmar que no eres un robot antes de continuar.",
+        message: "Debes completar el captcha antes de continuar.",
       });
       return;
     }
@@ -60,6 +60,7 @@ export default function GithubButton({ onNotify, captchaValid }: GithubButtonPro
         });
 
         localStorage.setItem("servineo_token", data.token);
+
         if (data.user) {
           localStorage.setItem("servineo_user", JSON.stringify(data.user));
           setUser(data.user);
@@ -81,7 +82,7 @@ export default function GithubButton({ onNotify, captchaValid }: GithubButtonPro
           if (data.isFirstTime) {
             router.push("/signUp/registrar/registroUbicacion");
           } else {
-            setTimeout(() => { window.location.href = "/"; }, 2000);
+            setTimeout(() => { window.location.href = "/" }, 2000);
           }
         }, 2000);
       }
@@ -105,7 +106,7 @@ export default function GithubButton({ onNotify, captchaValid }: GithubButtonPro
   return (
     <button
       onClick={handleGithub}
-      disabled={loading || !captchaValid}
+      disabled={loading}  
       className={`flex items-center gap-2 bg-white border border-gray-300 
         font-semibold py-2 px-4 rounded-lg shadow-sm text-black transition-colors
         ${!captchaValid ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-100"}
