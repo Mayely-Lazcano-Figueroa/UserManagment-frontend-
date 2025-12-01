@@ -6,6 +6,7 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { useAuth } from "../auth/usoAutentificacion";
 import { enviarUbicacion, enviarTokenGoogle } from "@/app/redux/services/auth/registro";
+import { useParams } from "next/navigation";   
 
 const customIcon = new L.Icon({
   iconUrl: "https://cdn-icons-png.flaticon.com/512/684/684908.png",
@@ -22,6 +23,9 @@ function MoveMapToPosition({ position }: { position: [number, number] }) {
 }
 
 export default function MapaLeaflet() {
+  const params = useParams();           
+  const locale = params.locale;         
+
   const [position, setPosition] = useState<[number, number] | null>(null);
   const [ubicacionPermitida, setUbicacionPermitida] = useState<boolean | null>(null);
   const [direccion, setDireccion] = useState<string | null>(null);
@@ -42,36 +46,34 @@ export default function MapaLeaflet() {
           const { latitude, longitude } = pos.coords;
           setPosition([latitude, longitude]);
           setUbicacionPermitida(true);
-     
-try {
-  setCargandoDireccion(true);
-  const res = await fetch(
-    `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&addressdetails=1`
-  );
-  const data = await res.json();
 
-  if (data) {
-    const dep = data.address?.state || null;
-    const country = data.address?.country || null;
-    let dir = data.display_name || null;
+          try {
+            setCargandoDireccion(true);
+            const res = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&addressdetails=1`
+            );
+            const data = await res.json();
 
-    //Limpiar la dirección para que no repita dep y país
-    if (dir) {
-      if (dep) dir = dir.replace(new RegExp(`,?\\s*${dep}`, "gi"), "");
-      if (country) dir = dir.replace(new RegExp(`,?\\s*${country}`, "gi"), "");
-      dir = dir.replace(/,\s*$/, "");
-    }
+            if (data) {
+              const dep = data.address?.state || null;
+              const country = data.address?.country || null;
+              let dir = data.display_name || null;
 
-    setDireccion(dir);
-    setDepartamento(dep);
-    setPais(country);
-  }
-} catch (error) {
-  console.error("Error obteniendo dirección:", error);
-} finally {
-  setCargandoDireccion(false);
-}
+              if (dir) {
+                if (dep) dir = dir.replace(new RegExp(`,?\\s*${dep}`, "gi"), "");
+                if (country) dir = dir.replace(new RegExp(`,?\\s*${country}`, "gi"), "");
+                dir = dir.replace(/,\s*$/, "");
+              }
 
+              setDireccion(dir);
+              setDepartamento(dep);
+              setPais(country);
+            }
+          } catch (error) {
+            console.error("Error obteniendo dirección:", error);
+          } finally {
+            setCargandoDireccion(false);
+          }
         },
         (error) => {
           console.warn("No se pudo obtener la ubicación:", error.message);
@@ -95,33 +97,26 @@ try {
 
   const manejarEnvio = async () => {
     try {
-      if (cargandoDireccion) {
-        return;
-      }
+      if (cargandoDireccion) return;
 
       let token = localStorage.getItem("servineo_token");
-      
 
       if (!token) {
         const googleToken = sessionStorage.getItem("google_token_temp");
-        if (!googleToken) {
-          return;
-        }
+        if (!googleToken) return;
 
         const data = await enviarTokenGoogle(googleToken);
         if (data.token && data.user) {
           token = data.token;
-          localStorage.setItem("servineo_token", data.token); // ✅ AGREGA ESTA LÍNEA
+          localStorage.setItem("servineo_token", data.token);
           localStorage.setItem("servineo_user", JSON.stringify(data.user));
           setUser(data.user);
           sessionStorage.removeItem("google_token_temp");
         } else {
           return;
         }
-
       }
 
-      // Enviar lat, lng, dirección, departamento, país
       await enviarUbicacion(
         position?.[0] || 0,
         position?.[1] || 0,
@@ -130,7 +125,9 @@ try {
         pais || null
       );
 
-      window.location.href = "/";
+      //redireccion telefono
+      window.location.href = `/${locale}/signUp/registrar/telefono`;
+
     } catch (error) {
       console.error(error);
     }
@@ -138,7 +135,6 @@ try {
 
   return (
     <div style={{ position: "relative", width: "100%" }}>
-
       <div
         style={{
           background: "white",
@@ -218,14 +214,11 @@ try {
             transition: "0.2s",
             boxShadow: "0 3px 10px rgba(43,106,224,0.3)",
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#1AA7ED")}
-          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#2B6AE0")}
           onClick={manejarEnvio}
         >
-          {cargandoDireccion ? "Obteniendo dirección..." : "Finalizar registro"}
+          {cargandoDireccion ? "Obteniendo dirección..." : "Continuar"}
         </button>
       </div>
     </div>
   );
 }
-
