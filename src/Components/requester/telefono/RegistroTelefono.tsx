@@ -4,7 +4,7 @@ import { useState } from "react";
 import * as registroService from "@/app/redux/services/auth/registro";
 import { useParams, usePathname } from "next/navigation";
 
-// 🌎 Configuración de países LATAM con sus validaciones
+// paises
 const PAISES_LATAM = [
   { 
     codigo: "+591", 
@@ -140,7 +140,7 @@ export default function RegistroTelefono() {
   const params = useParams();
   const pathname = usePathname();
   
-  // Detectar si viene del flujo de Google (con locale) o registro manual (sin locale)
+  // Detectar si viene del flujo o registro manual
   const locale = params.locale || null;
   const esRegistroManual = pathname?.includes("/signUp/registrar");
 
@@ -197,13 +197,13 @@ export default function RegistroTelefono() {
       const response = await registroService.enviarTelefono(telefonoCompleto);
 
       if (response.success) {
-        // ✅ Redirigir según el flujo
+        //Redirigir según el flujo
         if (esRegistroManual) {
-          window.location.href = "/"; // Registro manual va directo al inicio
+          window.location.href = "/"; // Registro manual 
         } else if (locale) {
-          window.location.href = `/${locale}`; // Google OAuth usa locale
+          window.location.href = `/${locale}`; 
         } else {
-          window.location.href = "/"; // Fallback
+          window.location.href = "/"; 
         }
       }
     } catch (error: any) {
