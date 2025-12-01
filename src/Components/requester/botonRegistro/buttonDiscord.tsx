@@ -11,7 +11,7 @@ interface DiscordButtonProps {
     message: string;
   }) => void;
 
-  captchaValid: boolean; // <-- NUEVO
+  captchaValid: boolean;
 }
 
 export default function DiscordButton({ onNotify, captchaValid }: DiscordButtonProps) {
@@ -26,7 +26,7 @@ export default function DiscordButton({ onNotify, captchaValid }: DiscordButtonP
       onNotify?.({
         type: "warning",
         title: "Completa la verificación",
-        message: "Debes confirmar que no eres un robot antes de continuar.",
+        message: "Debes completar el captcha antes de continuar.",
       });
       return;
     }
@@ -101,7 +101,7 @@ export default function DiscordButton({ onNotify, captchaValid }: DiscordButtonP
   return (
     <button
       onClick={handleDiscord}
-      disabled={loading || !captchaValid}
+      disabled={loading}  
       className={`flex items-center gap-2 bg-[#5865F2] text-white font-semibold py-2 px-4 rounded-lg transition
         ${!captchaValid ? "opacity-50 cursor-not-allowed" : "hover:opacity-90"}
       `}
