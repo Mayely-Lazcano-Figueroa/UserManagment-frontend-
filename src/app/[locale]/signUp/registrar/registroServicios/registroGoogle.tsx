@@ -14,7 +14,7 @@ interface RegistroGoogleProps {
     message: string;
   }) => void;
 
-  captchaValid: boolean;   // <-- NUEVA PROP
+  captchaValid: boolean;   
 }
 
 
@@ -101,11 +101,17 @@ export default function RegistroGoogle({ onSuccessClose, onNotify, captchaValid 
 
   return (
     <div className="flex justify-center">
-      <GoogleButton 
-  onLoginSuccess={handleLoginSuccess}
-  disabled={!captchaValid}
-/>
-
+      <GoogleButton
+        onLoginSuccess={handleLoginSuccess}
+        disabled={!captchaValid}
+        onDisabledClick={() =>
+          onNotify?.({
+            type: "warning",
+            title: "Verificación requerida",
+            message: "Debes completar el captcha antes de continuar.",
+          })
+        }
+      />
     </div>
   );
 }
