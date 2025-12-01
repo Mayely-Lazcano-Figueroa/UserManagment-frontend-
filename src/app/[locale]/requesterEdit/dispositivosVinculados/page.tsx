@@ -126,7 +126,7 @@ export default function DispositivosVinculados() {
       registrarDispositivo();
       obtenerDispositivos();
     }
-  }, [user]); // Solo depende de user
+  }, [user, registrarDispositivo, obtenerDispositivos]);
 
   if (loading) return <p className="text-center mt-10">Cargando usuario...</p>;
   if (!user) return <p className="text-center mt-10">No hay usuario autenticado</p>;

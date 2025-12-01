@@ -32,8 +32,8 @@ class ApiClient {
 
       const data = await response.json();
       return { success: response.ok, data, message: data.message };
-    } catch (error: any) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
       return { success: false, error: error.message };
     } finally {
       clearTimeout(id);
