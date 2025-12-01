@@ -40,9 +40,10 @@ const LoginGithub: React.FC<Props> = ({ onMensajeChange }) => {
       <button
         type="button"
         onClick={handleGithubClick}
-        className="max-w-[310px] w-full flex items-center justify-center gap-3 
-                   bg-white border border-gray-300 rounded-xl px-4 py-3 text-base 
-                   font-medium hover:bg-gray-100 transition shadow-sm"
+        className="inline-flex items-center justify-center gap-3
+                   bg-white border border-gray-300 rounded-xl
+                   px-4 py-3 text-base font-medium
+                   hover:bg-gray-100 transition shadow-sm"
       >
         <FaGithub className="text-xl" />
         <span>Continuar con GitHub</span>

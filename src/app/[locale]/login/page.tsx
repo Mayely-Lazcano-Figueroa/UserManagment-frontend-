@@ -156,7 +156,7 @@ export default function LoginPage() {
             localStorage.setItem("servineo_token", token);
             localStorage.setItem("servineo_user", JSON.stringify(user));
 
-            const nombre = (user as any).name || "Usuario";
+            const nombre = (user as { name?: string }).name || "Usuario";
 
             setNotification({
               isOpen: true,
@@ -255,10 +255,11 @@ export default function LoginPage() {
           }, 1500);
         } else {
           const mensajeError =
-            res.message ||
-            (res.data as any)?.message ||
-            (res as any)?.error ||
-            "No se pudo iniciar sesión con Discord.";
+          res.message ||
+          (res.data as unknown as { message?: string })?.message ||
+          (res as unknown as { error?: string })?.error ||
+          "No se pudo iniciar sesión con Discord.";
+
 
           setNotification({
             isOpen: true,
