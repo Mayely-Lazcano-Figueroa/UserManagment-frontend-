@@ -94,12 +94,12 @@ export default function RegistroForm({ onNotify, captchaValid }: RegistroFormPro
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // 🛑 VALIDACIÓN DEL CAPTCHA
+    
     if (!captchaValid) {
       onNotify?.({
         type: "warning",
         title: "Completa la verificación",
-        message: "Debes confirmar que no eres un robot antes de continuar.",
+        message: "Debes completar el captcha antes de continuar.",
       });
       return;
     }
@@ -274,13 +274,15 @@ export default function RegistroForm({ onNotify, captchaValid }: RegistroFormPro
 
       {/* Submit */}
       <button
-        type="submit"
-        disabled={cargando || !captchaValid}   // <-- BLOQUEA BOTÓN SI NO HAY CAPTCHA
-        className={`w-full flex items-center justify-center gap-2
-          ${(!captchaValid || cargando) ? "bg-primary/60 cursor-not-allowed" : "bg-primary/90 hover:bg-primary"}
-          text-white font-semibold rounded-xl p-2.5 mt-2 transition-all duration-300
-          shadow-md hover:shadow-lg disabled:opacity-60`}
+       type="submit"
+      disabled={cargando}   
+       className={`w-full flex items-center justify-center gap-2
+      ${!captchaValid ? "bg-primary/60 cursor-not-allowed" : "bg-primary/90 hover:bg-primary"}
+       ${cargando ? "opacity-60 cursor-not-allowed" : ""}
+       text-white font-semibold rounded-xl p-2.5 mt-2 transition-all duration-300
+       shadow-md hover:shadow-lg`}
       >
+
         {cargando ? (
           <>
             <Loader2 className="animate-spin w-5 h-5" />
