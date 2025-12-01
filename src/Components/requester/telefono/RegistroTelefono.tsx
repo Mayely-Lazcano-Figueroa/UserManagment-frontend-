@@ -4,7 +4,7 @@ import { useState } from "react";
 import * as registroService from "@/app/redux/services/auth/registro";
 import { useParams, usePathname } from "next/navigation";
 
-// paises
+//Configuración de países
 const PAISES_LATAM = [
   { 
     codigo: "+591", 
@@ -199,21 +199,25 @@ export default function RegistroTelefono() {
       if (response.success) {
         //Redirigir según el flujo
         if (esRegistroManual) {
-          window.location.href = "/"; // Registro manual 
+          window.location.href = "/"; // Registro manual
         } else if (locale) {
           window.location.href = `/${locale}`; 
         } else {
           window.location.href = "/"; 
         }
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error guardando teléfono:", error);
       
       // Manejar errores específicos
-      if (error.message?.includes("409") || error.message?.includes("ya está registrado")) {
-        setError("El número ya está registrado, use otro");
+      if (error instanceof Error) {
+        if (error.message.includes("409") || error.message.includes("ya está registrado")) {
+          setError("El número ya está registrado, use otro");
+        } else {
+          setError("Error de conexión. Intente nuevamente");
+        }
       } else {
-        setError("Error de conexión. Intente nuevamente");
+        setError("Error desconocido. Intente nuevamente");
       }
     } finally {
       setCargando(false);
