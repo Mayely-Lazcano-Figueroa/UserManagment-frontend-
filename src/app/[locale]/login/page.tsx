@@ -7,13 +7,18 @@ import { api, ApiResponse } from '@/app/redux/services/loginApi';
 import { Eye, EyeOff } from 'lucide-react';
 import LoginGoogle from '@/Components/login/Proveedores/LoginGoogle';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+//import Link from 'next/link';
 import NotificationModal from '@/Components/Modal-notifications';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { useAppDispatch } from '@/app/redux/hooks';
 import { setUser } from '@/app/redux/slice/userSlice';
 import LoginGithub from '@/Components/login/Proveedores/LoginGitHub';
 import LoginDiscord from '@/Components/login/Proveedores/LoginDiscord';
+// Nuevos modales para 2FA / selección de método
+import OpcionesLoginModal from '@/Components/login/SeleccionMetodoModal';
+import AuthenticatorSesion from '@/Components/requester/Authenticator/AuthenticatorSesionModal';
+import AuthenticatorTOTPModal from '@/Components/requester/Authenticator/AuthenticatorTOTPModal';
+import CodigoRecuperacionModal from '@/Components/requester/Authenticator/AuthenticatorCodigoModal';
 
 const loginSchema = z.object({
   email: z.string().email('Debe ingresar un correo válido'),
@@ -39,6 +44,11 @@ interface LoginResponse {
   token: string;
   user: BackendUser;
   message?: string;
+  // propiedades opcionales que el backend puede devolver para MFA
+  requires2FA?: boolean;
+  mfaRequired?: boolean;
+  mfaMethods?: string[];
+  email?: string;
 }
 
 interface NotificationState {
@@ -61,6 +71,10 @@ export default function LoginPage() {
     title: '',
     message: '',
   });
+
+  // Estado para los nuevos modales de autenticación/métodos
+  const [modalActivo, setModalActivo] = useState<'none' | 'opciones' | 'sesion' | 'totp' | 'codigo'>('none');
+  const [emailTOTP, setEmailTOTP] = useState('');
 
   const {
     register,
@@ -87,8 +101,40 @@ export default function LoginPage() {
           url_photo: (datos.user.picture || datos.user.url_photo || null) as string | undefined,
           role: (datos.user.role || 'requester') as 'requester' | 'fixer' | 'admin',
         };
+        // Detectar si el backend requiere MFA/2FA y abrir los modales correspondientes
+        const needs2FA = Boolean(
+          datos.requires2FA || datos.mfaRequired || (datos.mfaMethods && datos.mfaMethods.length > 0)
+        );
 
-        localStorage.setItem('servineo_token', datos.token);
+        if (needs2FA) {
+          const emailFor2FA = datos.email || datos.user?.email || data.email;
+          setEmailTOTP(emailFor2FA ?? '');
+
+          const methods = datos.mfaMethods || [];
+
+          if (methods.includes('passwordless') || methods.includes('session')) {
+            setModalActivo('sesion');
+          } else if (methods.includes('totp') || methods.includes('otp') || methods.includes('totp_sms')) {
+            setModalActivo('totp');
+          } else {
+            setModalActivo('opciones');
+          }
+
+          setNotification({
+            isOpen: true,
+            type: 'info',
+            title: 'Verificación adicional requerida',
+            message: datos.message || 'Se requiere un paso adicional para verificar tu cuenta.',
+          });
+
+          // No guardar token/localStorage hasta completar el flujo de MFA
+          return;
+        }
+
+        // Si no requiere 2FA, proceder normalmente
+        if (datos.token) {
+          localStorage.setItem('servineo_token', datos.token);
+        }
         localStorage.setItem('servineo_user', JSON.stringify(normalizedUser));
 
         dispatch(setUser(normalizedUser)); // ← ahora sí, sin errores
@@ -354,15 +400,16 @@ export default function LoginPage() {
               )}
             </div>
 
-            {/* Enlace auxiliar */}
-            <div className="flex justify-end items-center">
-              <Link
-                href="/login/forgotpass"
-                className="text-primary/90 hover:text-primary underline-offset-2 hover:underline text-sm font-medium"
+           {/* 🆕 UN SOLO BOTÓN que abre el modal de opciones */}
+            <p className="text-center text-sm text-gray-500">
+              <button
+                type="button"
+                onClick={() => setModalActivo('opciones')}
+                className="text-primary/90 hover:text-primary font-medium hover:underline transition"
               >
-                ¿Olvidaste tu contraseña?
-              </Link>
-            </div>
+                ¿Necesitas ayuda para ingresar?
+              </button>
+            </p>
 
             {/* Botón ingresar */}
             <button
@@ -414,6 +461,45 @@ export default function LoginPage() {
           title={notification.title}
           message={notification.message}
         />
+        {/* 🆕 MODAL DE OPCIONES */}
+        <OpcionesLoginModal
+          showModal={modalActivo === 'opciones'}
+          onClose={() => setModalActivo('none')}
+          onSelectForgotPassword={() => router.push('/login/forgotpass')}
+          onSelectPasswordless={() => setModalActivo('sesion')}
+        />
+
+        {/* Modal Sesión */}
+        {modalActivo === 'sesion' && (
+          <AuthenticatorSesion
+            showModal={true}
+            setShowModal={() => setModalActivo('none')}
+            emailTOTP={emailTOTP}
+            setEmailTOTP={setEmailTOTP}
+            abrirTOTP={() => setModalActivo('totp')}
+          />
+        )}
+
+        {/* Modal TOTP */}
+        {modalActivo === 'totp' && (
+          <AuthenticatorTOTPModal
+            showModal={true}
+            setShowModal={() => setModalActivo('none')}
+            regresarSesionModal={() => setModalActivo('sesion')}
+            email={emailTOTP}
+            abrirModalCodigo={() => setModalActivo('codigo')}
+          />
+        )}
+
+        {/* Modal Código de recuperación */}
+        {modalActivo === 'codigo' && (
+          <CodigoRecuperacionModal
+            showModal={true}
+            cerrarModal={() => setModalActivo('none')}
+            volverATOTP={() => setModalActivo('totp')}
+            email={emailTOTP}
+          />
+        )}
       </main>
     </GoogleOAuthProvider>
   );
