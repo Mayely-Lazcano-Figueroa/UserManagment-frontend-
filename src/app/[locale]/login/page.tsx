@@ -1,18 +1,19 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { api, ApiResponse } from '@/app/redux/services/loginApi';
 import { Eye, EyeOff } from 'lucide-react';
-import LoginGoogle from '@/Components/login/google/LoginGoogle';
+import LoginGoogle from '@/Components/login/Proveedores/LoginGoogle';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import NotificationModal from '@/Components/Modal-notifications';
 import { GoogleOAuthProvider } from '@react-oauth/google';
-
 import { useAppDispatch } from '@/app/redux/hooks';
 import { setUser } from '@/app/redux/slice/userSlice';
+import LoginGithub from '@/Components/login/Proveedores/LoginGitHub';
+import LoginDiscord from '@/Components/login/Proveedores/LoginDiscord';
 
 const loginSchema = z.object({
   email: z.string().email('Debe ingresar un correo válido'),
@@ -138,6 +139,156 @@ export default function LoginPage() {
     });
   };
 
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+        if (!apiUrl) return;
+
+        const apiOrigin = new URL(apiUrl).origin;
+        if (event.origin !== apiOrigin) return;
+
+        const data = event.data || {};
+        const { type, token, user, message } = data;
+
+        if (type === "GITHUB_AUTH_SUCCESS") {
+          if (token && user) {
+            localStorage.setItem("servineo_token", token);
+            localStorage.setItem("servineo_user", JSON.stringify(user));
+
+            const nombre = (user as any).name || "Usuario";
+
+            setNotification({
+              isOpen: true,
+              type: "success",
+              title: "Inicio de sesión exitoso",
+              message: `¡Bienvenido, ${nombre}!`,
+            });
+
+            setTimeout(() => {
+              window.location.href = "/";
+            }, 1500);
+          } else {
+            setNotification({
+              isOpen: true,
+              type: "error",
+              title: "Error al iniciar sesión",
+              message:
+                "Respuesta inválida desde GitHub. Inténtalo nuevamente.",
+            });
+          }
+        }
+
+        if (type === "GITHUB_AUTH_ERROR") {
+          setNotification({
+            isOpen: true,
+            type: "error",
+            title: "Error al iniciar sesión",
+            message: message || "No se pudo iniciar sesión con GitHub.",
+          });
+        }
+      } catch (err) {
+        console.error("Error procesando mensaje de GitHub:", err);
+      }
+    };
+
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, []);
+
+    // 🔹 Manejo de login con Discord (redirect a /login?provider=discord&code=...)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const search = window.location.search;
+    const params = new URLSearchParams(search);
+    const provider = params.get("provider");
+    const code = params.get("code");
+    const error = params.get("error");
+
+    // Solo nos interesa cuando viene de Discord
+    if (provider !== "discord") return;
+
+    if (error) {
+      setNotification({
+        isOpen: true,
+        type: "error",
+        title: "Error de autenticación",
+        message: error,
+      });
+      window.history.replaceState({}, "", "/login");
+      return;
+    }
+
+    if (!code) return;
+
+    const loginDiscord = async () => {
+      try {
+        setLoading(true);
+
+        const res: ApiResponse<LoginResponse> = await api.post(
+          "/auth/discord",
+          { code }
+        );
+
+        if (res.success && res.data) {
+          const datos = res.data;
+
+          localStorage.setItem("servineo_token", datos.token);
+          localStorage.setItem("servineo_user", JSON.stringify(datos.user));
+
+          const mensajeExito =
+            datos.message || `¡Bienvenido, ${datos.user.name}!`;
+
+          setNotification({
+            isOpen: true,
+            type: "success",
+            title: "Inicio de sesión exitoso",
+            message: mensajeExito,
+          });
+
+          // limpiar parámetros de la URL
+          window.history.replaceState({}, "", "/login");
+
+          setTimeout(() => {
+            window.location.href = "/";
+          }, 1500);
+        } else {
+          const mensajeError =
+            res.message ||
+            (res.data as any)?.message ||
+            (res as any)?.error ||
+            "No se pudo iniciar sesión con Discord.";
+
+          setNotification({
+            isOpen: true,
+            type: "error",
+            title: "Error al iniciar sesión",
+            message: mensajeError,
+          });
+
+          window.history.replaceState({}, "", "/login");
+        }
+      } catch (err: unknown) {
+        console.error("[LOGIN] Error en loginDiscord:", err);
+        const message =
+          err instanceof Error
+            ? err.message
+            : "No se pudo conectar con el servidor.";
+        setNotification({
+          isOpen: true,
+          type: "error",
+          title: "Error de conexión",
+          message,
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loginDiscord();
+  }, []);
+
   return (
     <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}>
       {/* 🔹 Todo el contenido dentro de un solo elemento raíz */}
@@ -232,8 +383,14 @@ export default function LoginPage() {
           </div>
 
           {/* Botón Google */}
-          <div className="mt-4">
+          <div className="flex flex-col items-center gap-3 mt-4">
             <LoginGoogle onMensajeChange={handleMensajeChange} />
+          
+            {/* Botón GitHub */}
+            <LoginGithub onMensajeChange={handleMensajeChange} />
+
+            {/* Botón Discord */}
+            <LoginDiscord onMensajeChange={handleMensajeChange} />
           </div>
 
           {/* Registro */}
