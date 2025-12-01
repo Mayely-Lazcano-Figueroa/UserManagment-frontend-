@@ -8,20 +8,42 @@ interface Props {
   loading?: boolean;
 }
 
+// 🆕 Agregar interfaz para el error de axios
+interface AxiosErrorResponse {
+  response?: {
+    status?: number;
+    data?: {
+      message?: string;
+      minutesLeft?: number;
+      minutosRestantes?: number;
+      attemptsLeft?: number;
+      intentosRestantes?: number;
+    };
+  };
+}
+
 export default function VerifyTokenModal({ open, onClose, onVerify, loading }: Props) {
   const [code, setCode] = useState('');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [shake, setShake] = useState(false);
 
+  // NUEVO: intentos restantes y mensaje de bloqueo
+  const [attemptsLeft, setAttemptsLeft] = useState<number | null>(null);
+  const [lockedInfo, setLockedInfo] = useState<string | null>(null);
+  
   useEffect(() => {
     if (open) {
       setCode('');
       setErrorMsg(null);
       setShake(false);
+      setAttemptsLeft(null);
+      setLockedInfo(null);
     } else {
       setCode('');
       setErrorMsg(null);
       setShake(false);
+      setAttemptsLeft(null);
+      setLockedInfo(null);
     }
   }, [open]);
 
@@ -31,6 +53,8 @@ export default function VerifyTokenModal({ open, onClose, onVerify, loading }: P
     const onlyDigits = e.target.value.replace(/\D/g, '');
     setCode(onlyDigits.slice(0, 6));
     if (errorMsg) setErrorMsg(null);
+    if (attemptsLeft !== null) setAttemptsLeft(null);
+    if (lockedInfo) setLockedInfo(null);
   };
 
   const handleSubmit = async (e?: React.FormEvent) => {
@@ -45,7 +69,34 @@ export default function VerifyTokenModal({ open, onClose, onVerify, loading }: P
     try {
       await onVerify(code.trim());
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Código incorrecto o expirado. Intenta nuevamente.';
+      // Limpio estados anteriores
+      setAttemptsLeft(null);
+      setLockedInfo(null);
+
+      let msg = 'Código incorrecto o expirado. Intenta nuevamente.';
+
+      // ✅ Type guard con tipado correcto
+      if (err && typeof err === 'object' && 'response' in err) {
+        const axiosError = err as AxiosErrorResponse;
+        const status = axiosError.response?.status;
+        const data = axiosError.response?.data;
+
+        if (status === 423) {
+          // bloqueado por demasiados intentos
+          const minutes = data?.minutesLeft || data?.minutosRestantes || 5;
+          
+          setLockedInfo(`Podrás volver a intentar en aproximadamente ${minutes} minuto(s).`);
+          msg = `Cuenta bloqueada por demasiados intentos fallidos. Intenta de nuevo en ${minutes} minutos.`;
+        } else if (status === 429) {
+          // limite de intentos alcanzado pero aún no bloqueado
+          const remaining = data?.attemptsLeft ?? data?.intentosRestantes ?? 0;
+          setAttemptsLeft(remaining);
+          msg = data?.message || `Código incorrecto. Te quedan ${remaining} intentos.`;
+        } else if (status === 400 || status === 401) {
+          msg = data?.message || 'Código incorrecto o expirado.';
+        }
+      }
+
       setErrorMsg(msg);
       setShake(true);
       setTimeout(() => setShake(false), 400);
@@ -60,9 +111,12 @@ export default function VerifyTokenModal({ open, onClose, onVerify, loading }: P
           shake ? 'animate-shake border-red-400' : ''
         }`}
       >
-        <h3 className="text-lg font-semibold mb-2">Ingresa el código de autenticador</h3>
-        <p className="text-sm text-gray-600 mb-4">Introduce los 6 dígitos que muestra tu app de autenticación.</p>
-
+        <h3 className="text-lg font-semibold mb-2">
+          Ingresa el código de autenticador
+        </h3>
+        <p className="text-sm text-gray-600 mb-4">
+          Introduce los 6 dígitos que muestra tu app de autenticación.
+        </p>
         <input
           autoFocus
           inputMode="numeric"
@@ -75,7 +129,25 @@ export default function VerifyTokenModal({ open, onClose, onVerify, loading }: P
           placeholder="••••••"
         />
 
-        {errorMsg && <div className="text-red-600 text-sm mb-3 text-center font-medium">{errorMsg}</div>}
+        {errorMsg && (
+          <div className="text-red-600 text-sm mb-1 text-center font-medium">
+            {errorMsg}
+          </div>
+        )}
+
+        {/* NUEVO: intentos restantes */}
+        {attemptsLeft !== null && attemptsLeft >= 0 && (
+          <div className="text-xs text-center text-red-500 mb-1">
+            Intentos restantes: <span className="font-semibold">{attemptsLeft}</span>
+          </div>
+        )}
+
+        {/* NUEVO: info de bloqueo */}
+        {lockedInfo && (
+          <div className="text-xs text-center text-red-500 mb-2">
+            {lockedInfo}
+          </div>
+        )}
 
         <div className="flex justify-end gap-3 mt-2">
           <button
@@ -83,6 +155,8 @@ export default function VerifyTokenModal({ open, onClose, onVerify, loading }: P
             onClick={() => {
               setCode('');
               setErrorMsg(null);
+              setAttemptsLeft(null);
+              setLockedInfo(null);
               onClose();
             }}
             className="px-3 py-2 rounded border text-sm bg-white text-gray-700"
@@ -90,7 +164,11 @@ export default function VerifyTokenModal({ open, onClose, onVerify, loading }: P
           >
             Cancelar
           </button>
-          <button type="submit" className="px-4 py-2 rounded text-sm bg-indigo-600 text-white" disabled={loading}>
+          <button
+            type="submit"
+            className="px-4 py-2 rounded text-sm bg-indigo-600 text-white"
+            disabled={loading}
+          >
             {loading ? 'Verificando...' : 'Verificar'}
           </button>
         </div>
